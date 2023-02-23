@@ -24,8 +24,20 @@ export const POST = (async ({ fetch, request }) => {
                 installation: installation.id
             })
         });
-    } else if (event === 'pull_request' && (action === 'created' || action === 'synchronize')) {
-        await fetch('/api/app/check', {
+    } else if (event === 'pull_request' && (action === 'opened' || action === 'synchronize')) {
+        // await fetch('/api/app/check', {
+        //     method: 'POST',
+        //     body: JSON.stringify({
+        //         owner: repo.owner.login,
+        //         repo: repo.name,
+        //         installation: installation.id,
+        //         commit: body.after
+        //     })
+        // });
+
+        console.log("Starting build");
+
+        await fetch('/api/build/start', {
             method: 'POST',
             body: JSON.stringify({
                 owner: repo.owner.login,

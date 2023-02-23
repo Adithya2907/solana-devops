@@ -10,5 +10,10 @@ export default defineConfig({
 		alias: {
 			'node-fetch': 'isomorphic-fetch'
 		}
+	},
+	server: {
+		watch: {
+			ignored: ['**/.artifacts/**']
+		}
 	}
 });
