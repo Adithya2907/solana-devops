@@ -1,4 +1,13 @@
-#!/bin/sh
+#!/bin/bash
+
+# Instead of installing curl, and installing rustup and solana with curl,
+# Consider doing ADD in Dockerfile, which is significantly faster like: 
+# ADD https://release.solana.com/stable/install /tmp
+# RUN sh -c /tmp/install
+
+apt-get -y update; apt-get -y install curl
+source /root/.bashrc
+
 curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
 . /root/.cargo/env
 sh -c "$(curl -sSfL https://release.solana.com/stable/install)"

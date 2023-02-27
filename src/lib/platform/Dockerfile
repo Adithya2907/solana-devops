@@ -2,6 +2,7 @@ FROM ubuntu:18.04
 
 WORKDIR /app
 
-COPY ./repo .
+COPY ./repo ./
 
-CMD ./install.sh
+SHELL ["/bin/bash", "-c"]
+CMD /app/install.sh
