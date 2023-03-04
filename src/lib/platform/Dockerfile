@@ -1,5 +1,8 @@
 FROM ubuntu:18.04
 
+ARG anchor_version
+ENV _BUILD_ANCHOR_VERSION=$anchor_version
+
 WORKDIR /app
 
 COPY ./repo ./

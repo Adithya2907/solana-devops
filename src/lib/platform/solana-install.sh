@@ -23,10 +23,10 @@ export PATH="/root/.local/share/solana/install/active_release/bin:$PATH"
 source /root/.bashrc
 source /root/.profile
 
-apt-get update && apt-get upgrade -y && apt-get install -y pkg-config build-essential libudev-dev libssl-dev
+apt-get install -y pkg-config build-essential libudev-dev libssl-dev
 cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
-avm install latest
-avm use latest
+avm install ${_BUILD_ANCHOR_VERSION}
+avm use ${_BUILD_ANCHOR_VERSION}
 avm --version
 . /root/.bashrc
 . /root/.profile
