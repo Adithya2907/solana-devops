@@ -11,7 +11,7 @@ export const POST = (async ({ fetch, request }) => {
 	const repo = body.repository;
 	const installation = body.installation;
 
-	console.log('testing push');
+	console.log('testing push 2');
 	console.log('event: ', event, action, repo.full_name);
 
 	if (event === 'push') {
