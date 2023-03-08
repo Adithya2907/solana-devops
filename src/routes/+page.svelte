@@ -17,16 +17,16 @@
 	let repos = [];
 
 	onMount(async () => {
-		if (data.user.authenticating) {
+		if (data.userCookie.authenticating) {
 			tokenform.submit();
 		}
 
-		if (data.user.authenticated && $user === null) {
+		if (data.userCookie.authenticated && $user === null) {
 			const octokit = new Octokit({
-				auth: 'Bearer ' + data.user.token
+				auth: 'Bearer ' + data.userCookie.token
 			});
 
-			user.initialize(data.user.token!, data.info!, octokit);
+			user.initialize(data.userCookie.token!, data.info!, octokit);
 		}
 
 		let response = await $user?.octokit.rest.apps.listInstallationsForAuthenticatedUser();
@@ -42,8 +42,8 @@
 	});
 </script>
 
-{#if !data.user.authenticated}
-	{#if data.user.authenticating}
+{#if !data.userCookie.authenticated}
+	{#if data.userCookie.authenticating}
 		<p>Authenticating...</p>
 		<form bind:this={tokenform} method="POST" action="?/token" use:enhance />
 	{:else}
@@ -57,19 +57,14 @@
 		<button type="submit">Logout</button>
 	</form>
 
-	<p>Installations</p>
-	<ul>
-		{#each installations as installation}
-			<li>ID: {installation.id}</li>
-		{/each}
-	</ul>
-
-	<p>Repos</p>
-	<ul>
-		{#each repos as repo}
-			<li><a href={repo.html_url} target="_blank" rel="noreferrer">{repo.full_name}</a></li>
-		{/each}
-	</ul>
+	<p>Installed Repos</p>
+	{#if data.user?.repos}
+		<ul>
+			{#each data.user?.repos as repo}
+				<li><a href="/repo/{repo.name}">{repo.name}</a></li>
+			{/each}
+		</ul>
+	{/if}
 
 	<p>Can't find your repo?</p>
 	<a href="https://www.github.com/apps/sidharth-anand-ghat/installations/new">

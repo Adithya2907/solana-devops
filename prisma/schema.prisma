@@ -1,0 +1,103 @@
+datasource db {
+  provider = "mysql"
+  url      = "mysql://fqea1xgq429gjsilxo92:pscale_pw_3uWPiOMO991qtBKb4R8jVGtCmTPCgRcZKFNKwtjP4SX@ap-south.connect.psdb.cloud/solstrommdev?sslaccept=strict"
+  relationMode = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  login String @unique
+  repos Repo[]
+}
+
+model Repo {
+  id Int @id @default(autoincrement())
+  name String
+  fullname String @unique
+  url String
+  state RepoState
+  installationID Int
+  listeners Listener[]
+
+  owner User? @relation(fields: [ownerID], references: [id])
+  ownerID Int?
+
+  @@unique([ownerID, name])
+}
+
+model Listener {
+  id Int @id @default(autoincrement())
+
+  branch String
+  type ListenerType
+
+  autodeploy Boolean @default(true)
+  deploytarget DeployTarget
+
+  builds Build[]
+  deploys Deploy[]
+
+  repo Repo? @relation(fields: [repoID], references: [id])
+  repoID Int?
+
+  @@unique([repoID, branch, type])
+}
+
+model Build {
+  id Int @id @default(autoincrement())
+
+  commit String
+
+  log String? //Link to S3 URL of log output
+  status BuildStatus @default(QUEUED)
+  conclusion BuildConclusion?
+
+  started DateTime?
+  ended DateTime?
+
+  listener Listener? @relation(fields: [listenerID], references: [id])
+  listenerID Int?
+}
+
+model Deploy {
+  id Int @id @default(autoincrement())
+
+  //TODO: include support for versioning and tagging
+
+  listener Listener? @relation(fields: [listenerID], references: [id])
+  listenerID Int
+}
+
+enum RepoState {
+  INSTALLED
+  ACTIVE
+}
+
+enum BuildStatus {
+  QUEUED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum BuildConclusion {
+  CANCELLED
+  FAILURE
+  SUCCESS
+  SKIPPED
+  TIMEOUT
+}
+
+enum ListenerType {
+  PULL_REQUEST
+  PUSH
+}
+
+enum DeployTarget {
+  DEV
+  TEST
+  PROD
+}
