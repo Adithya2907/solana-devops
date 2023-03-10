@@ -129,13 +129,10 @@ export const POST = (async ({ request }) => {
 				started_at: new Date().toISOString()
 			});
 
-			let result = {
-				status: false,
-				log: 'Build failed! View check logs for details'
-			}
-
 			try {
-				result = await build(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
+				const result = await build(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
+
+				console.log(result.log.length);
 
 				app?.rest.checks.update({
 					owner: repo.owner.login,
@@ -147,7 +144,7 @@ export const POST = (async ({ request }) => {
 					output: {
 						title: 'SolStromm Build',
 						summary: result.status ? 'Build completed successfully!' : 'Build failed! View check logs for details',
-						text: result.log ?? 'text'
+						text: result.log
 					}
 				});
 

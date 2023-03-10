@@ -9,7 +9,8 @@ import { get } from 'svelte/store';
 
 import { BuildStatus, BuildConclusion } from '@prisma/client';
 
-import AWS from 'aws-sdk';
+// import AWS from 'aws-sdk';
+import * as AWS from '@aws-sdk/client-s3';
 
 import extract from 'extract-zip';
 
@@ -24,6 +25,21 @@ type BuildResult = {
     log: string;
 };
 
+function readStream(stream: stream.Readable): string {
+    stream.pause();
+
+    let chunk: string;
+    let data = '';
+
+    while ((chunk = stream.read()) !== null) {
+        data += chunk;
+    }
+
+    stream.resume();
+
+    return data;
+}
+
 export async function build(owner: string, repo: string, commit: string, installation: number, repoBuild: Build): Promise<BuildResult> {
     const outputStream = new stream.PassThrough({
         encoding: "utf-8",
@@ -35,10 +51,6 @@ export async function build(owner: string, repo: string, commit: string, install
         status: false,
         log: ""
     };
-
-    outputStream.on("data", (data) => {
-        console.log(data);
-    });
 
     outputStream.push("Starting download\n");
 
@@ -93,68 +105,77 @@ export async function build(owner: string, repo: string, commit: string, install
     outputStream.push("\n" + buildProcess);
 
     const s3 = new AWS.S3({
-        accessKeyId: AWS_S3_ACCESS_KEY,
-        secretAccessKey: AWS_S3_SECRET_KEY
+        credentials: {
+            accessKeyId: AWS_S3_ACCESS_KEY,
+            secretAccessKey: AWS_S3_SECRET_KEY
+        },
+        region: 'ap-south-1'
     });
 
     const idls = fs.readdirSync(path.join(PUBLIC_REPO_PATH, "artifacts", "idl"));
-    const idluploads: Array<AWS.S3.ManagedUpload.SendData> = [];
+    const idlkeys: Array<string> = [];
     idls
         .map(idl =>
             path.join(PUBLIC_REPO_PATH, "artifacts", "idl", idl))
-        .forEach(idl => {
-            s3.upload({
-                Bucket: 'idl-files',
-                Body: fs.createReadStream(idl),
-                Key: "folder/" + Date.now() + "_" + path.basename(idl)
-            }, (err, data) => {
-                if (err !== null || err !== undefined) {
-                    outputStream.push("ERROR: Could not upload IDL to S3");
-                    outputStream.push("DESCRIPTION: " + err.message);
+        .forEach(async (idl) => {
+            try {
+                const key = Date.now() + "_" + path.basename(idl);
 
-                    buildResult.status = false;
-                }
+                await s3.putObject({
+                    Bucket: 'idl-files',
+                    Body: fs.createReadStream(idl),
+                    Key: key,
+                });
 
-                console.log(`Uploaded IDL ${idl} to ${data.Location}`, data);
-                idluploads.push(data);
-            });
+                idlkeys.push(key);
+            } catch (err) {
+                outputStream.push("ERROR: Could not upload IDL to S3");
+                outputStream.push("DESCRIPTION: " + err.message);
+
+                buildResult.status = false;
+            }
         });
 
-    let logupload: AWS.S3.ManagedUpload.SendData;
+    let logupload: string;
+    
+    buildResult.log = readStream(outputStream);
 
-    s3.upload({
-        Bucket: 'idl-files',
-        Body: outputStream,
-        Key: "folder/" + Date.now() + "_" + commit + 'build'
-    }, (err, data) => {
-        if (err !== null || err !== undefined) {
-            outputStream.push("ERROR: Could not upload build logs to S3");
-            outputStream.push("DESCRIPTION: " + err.message);
+    try {
+        const key = Date.now() + "_" + commit + '_build';
 
-            buildResult.status = false;
-        }
+        await s3.putObject({
+            Bucket: 'idl-files',
+            Body: buildResult.log,
+            Key: key
+        });
 
-        logupload = data;
+        logupload = key;
+    } catch (err) {
+        outputStream.push("ERROR: Could not upload build logs to S3");
+        outputStream.push("DESCRIPTION: " + err.message);
 
-        console.log(`Upload logs to ${data.Location}`, data);
-    });
-
-    outputStream.pause();
+        buildResult.status = false;
+    }
 
     buildResult.status = true;
-    buildResult.log = outputStream.read();
 
-    console.log(buildResult.log);
+    await db.iDL.createMany({
+        data: idlkeys.map((key, index) => ({
+            program: idls[index].split('.')[0],
+            key,
+            buildId: repoBuild.id
+        }))
+    });
 
-    db.build.update({
+    await db.build.update({
         where: {
             id: repoBuild.id
         },
         data: {
             status: BuildStatus.COMPLETED,
             conclusion: buildResult.status ? BuildConclusion.SUCCESS : BuildConclusion.FAILURE,
-            //@ts-ignore
-            log: logupload?.Location,
+            log: logupload,
+            ended: new Date()
         }
     });
 
