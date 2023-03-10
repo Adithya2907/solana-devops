@@ -225,6 +225,16 @@ button:focus:not(:focus-visible) {
 	color: #86b8b6;
 	margin-right: 20px;
 	padding-bottom: 40px;
+	transition: all 0.3s;
+}
+
+.tabs__trigger:active {
+	color: blue;
+}
+
+.tabs__trigger:hover {
+	cursor: pointer;
+	color: #698582;
 }
 
 .tabs__trigger:focus {
@@ -232,8 +242,4 @@ button:focus:not(:focus-visible) {
 	outline: none;
 	color: white;
 	border-bottom: 1px solid #26e97e;
-}
-
-.tabs__trigger:hover {
-	cursor: pointer;
 }
