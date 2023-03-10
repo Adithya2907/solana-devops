@@ -210,3 +210,30 @@ button:focus:not(:focus-visible) {
 .grid-span {
 	grid-column: 1/-1;
 }
+
+/* TABS */
+.tabs__list {
+	flex-shrink: 0;
+	margin-top: 20px;
+	display: flex;
+	border-bottom: 1px solid #282d2b;
+}
+
+.tabs__trigger {
+	background-color: transparent;
+	border: none;
+	color: #86b8b6;
+	margin-right: 20px;
+	padding-bottom: 40px;
+}
+
+.tabs__trigger:focus {
+	position: relative;
+	outline: none;
+	color: white;
+	border-bottom: 1px solid #26e97e;
+}
+
+.tabs__trigger:hover {
+	cursor: pointer;
+}
