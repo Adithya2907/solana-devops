@@ -1,4 +1,5 @@
 <script lang="ts">
+	import './styles.css';
 	import type { PageData } from './$types';
 
 	import { Octokit } from 'octokit';
