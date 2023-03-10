@@ -1,12 +1,19 @@
 <script lang="ts">
-	import type { PageData } from '../$types';
+	import type { PageData } from './$types';
+
+	import type { Build } from '@prisma/client';
 
 	import { enhance } from '$app/forms';
 
 	export let data: PageData;
+
+	const listeners = data.repo?.listeners;
+	const builds = listeners?.reduce<Build[]>((acc, listener) => {
+		return [...acc, ...listener.builds];
+	}, []);
 </script>
 
-<p>Details for repo: {data.repo.name}</p>
+<p>Details for repo: {data.repo?.name}</p>
 
 <p>Branches:</p>
 <ul>
@@ -17,12 +24,25 @@
 	{/each}
 </ul>
 
-<p>Listeners</p>
-<ul>
-	{#each data.repo.listeners as listener}
-		{listener.branch} on {listener.type}
-	{/each}
-</ul>
+{#if data.repo}
+	<p>Listeners</p>
+	<ul>
+		{#each data.repo.listeners as listener}
+			<li>{listener.branch} on {listener.type}</li>
+		{/each}
+	</ul>
+{/if}
+
+{#if builds}
+	<p>Builds</p>
+	<ul>
+		{#each builds as build}
+			<li>
+				<a href="/repo/{data.repo?.name}/build/{build.id}">Build {build.id}</a>
+			</li>
+		{/each}
+	</ul>
+{/if}
 
 <p>Add Listener</p>
 <form method="POST" action="?/listener:add" use:enhance>
@@ -48,8 +68,8 @@
 		<option value="TEST">testnet</option>
 		<option value="PROD">mainnet</option>
 	</select>
-	<input name="repoID" class="hidden" type="number" value={data.repo.id} />
-    <br><button type="submit">Create</button>
+	<input name="repoID" class="hidden" type="number" value={data.repo?.id} />
+	<br /><button type="submit">Create</button>
 </form>
 
 <style>

@@ -1,12 +1,9 @@
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 
 import { ListenerType, DeployTarget } from '@prisma/client'
 
-import { get } from 'svelte/store';
+import { fail } from '@sveltejs/kit';
 
-import { error, fail } from '@sveltejs/kit';
-
-import GHAppStore from '$lib/stores/app.server';
 import db from '$lib/db/client';
 
 export const actions = {
@@ -46,38 +43,3 @@ export const actions = {
         });
     }
 } satisfies Actions;
-
-export const load = (async ({ params, parent }) => {
-    const { user } = await parent();
-    const name = params.name;
-
-    const partial = user?.repos.find(repo => repo.name === name);
-
-    if (partial === undefined)
-        throw error(404, 'Could not find repo');
-
-    const octokit = await get(GHAppStore).octokit?.getInstallationOctokit(partial.installationID)
-    const result = await octokit?.rest.repos.listBranches({
-        owner: user?.login ?? '',
-        repo: name
-    });
-
-    if (result === undefined)
-        throw error(500, 'Could not fetch branches for repo');
-
-    const repo = await db.repo.findUnique({
-        where: {
-            fullname: partial.fullname
-        },
-        include: {
-            listeners: true,
-        },
-    });
-
-    const branches = result.data;
-
-    return {
-        repo,
-        branches
-    };
-}) satisfies PageServerLoad;

@@ -1,12 +1,16 @@
 import type { RequestHandler } from './$types';
 
-import type { User, Repo, Listener } from '@prisma/client';
+import type { User, Repo, Listener, Build } from '@prisma/client';
 
 import { RepoState } from '@prisma/client';
 
+import { get } from 'svelte/store';
 import { error, json } from '@sveltejs/kit';
 
+import { build } from '$lib/build/build';
+
 import db from '$lib/db/client';
+import GHApp from '$lib/stores/app.server';
 
 async function getUser(login: string): Promise<(User & {
 	repos: (Repo & {
@@ -29,7 +33,19 @@ async function getUser(login: string): Promise<(User & {
 	return user;
 }
 
-export const POST = (async ({ fetch, request }) => {
+async function createBuild(commit: string, listener: number): Promise<Build> {
+	const build = db.build.create({
+		data: {
+			commit,
+			started: new Date(),
+			listenerID: listener
+		}
+	});
+
+	return build;
+}
+
+export const POST = (async ({ request }) => {
 	const event = request.headers.get('X-GitHub-Event');
 
 	const body = await request.json();
@@ -37,6 +53,8 @@ export const POST = (async ({ fetch, request }) => {
 	const action = body.action;
 	const repo = body.repository;
 	const installation = body.installation;
+
+	const app = await get(GHApp).octokit?.getInstallationOctokit(installation.id);
 
 	if (event === 'push') {
 		const user = await getUser(repo.owner.login);
@@ -49,18 +67,34 @@ export const POST = (async ({ fetch, request }) => {
 		if (repository === undefined)
 			throw error(400, "Could not find repository with name: " + repo.name);
 
-		const listener = repository?.listeners.find(listener => listener.branch === body.pull_request.head.ref);
-
+		const listener = repository?.listeners.find(listener => listener.branch === body.ref.split('/').pop());
 
 		if (listener !== undefined) {
-			await fetch('/api/build/start', {
-				method: 'POST',
-				body: JSON.stringify({
-					owner: repo.owner.login,
-					repo: repo.name,
-					installation: installation.id,
-					commit: body.after
-				})
+			const repoBuild = await createBuild(body.after, listener.id);
+
+			const check = await app?.rest.checks.create({
+				owner: repo.owner.login,
+				repo: repo.name,
+				name: 'SolStromm Build',
+				status: 'in_progress',
+				head_sha: body.after,
+				started_at: new Date().toISOString()
+			});
+
+			const result = await build(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
+
+			app?.rest.checks.update({
+				owner: repo.owner.login,
+				repo: repo.name,
+				check_run_id: check,
+				status: 'completed',
+				conclusion: result.status ? 'success' : 'failure',
+				completed_at: new Date().toISOString(),
+				output: {
+					title: 'SolStromm Build',
+					summary: result.status ? 'Build completed successfully!' : 'Build failed! View check logs for details',
+					text: result.log
+				}
 			});
 		}
 	} else if (event === 'pull_request' && (action === 'opened' || action === 'synchronize')) {
@@ -74,19 +108,58 @@ export const POST = (async ({ fetch, request }) => {
 		if (repository === undefined)
 			throw error(400, "Could not find repository with name: " + repo.name);
 
-		const listener = repository?.listeners.find(listener => listener.branch === body.pull_request.head.ref);
-
+		const listener = repository?.listeners.find(listener => listener.branch === body.pull_request.base.ref);
 
 		if (listener !== undefined) {
-			await fetch('/api/build/start', {
-				method: 'POST',
-				body: JSON.stringify({
+			const repoBuild = await createBuild(body.after, listener.id);
+
+			await app?.rest.issues.createComment({
+				owner: repo.owner.login,
+				repo: repo.name,
+				issue_number: body.pull_request.number,
+				body: `Automated build started for commit ${body.after}\n. Look at the check for status.`
+			});
+
+			const check = await app?.rest.checks.create({
+				owner: repo.owner.login,
+				repo: repo.name,
+				name: 'SolStromm Build',
+				status: 'in_progress',
+				head_sha: body.after,
+				started_at: new Date().toISOString()
+			});
+
+			let result = {
+				status: false,
+				log: 'Build failed! View check logs for details'
+			}
+
+			try {
+				result = await build(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
+
+				app?.rest.checks.update({
 					owner: repo.owner.login,
 					repo: repo.name,
-					installation: installation.id,
-					commit: body.after
-				})
-			});
+					check_run_id: check?.data.id,
+					status: 'completed',
+					conclusion: result.status ? 'success' : 'failure',
+					completed_at: new Date().toISOString(),
+					output: {
+						title: 'SolStromm Build',
+						summary: result.status ? 'Build completed successfully!' : 'Build failed! View check logs for details',
+						text: result.log ?? 'text'
+					}
+				});
+
+				await app?.rest.issues.createComment({
+					owner: repo.owner.login,
+					repo: repo.name,
+					issue_number: body.pull_request.number,
+					body: result.status ? 'Build completed successfully!' : 'Build failed! View check logs for details'
+				});
+			} catch (e) {
+				console.log(e);
+			}
 		}
 	} else if (event === 'installation_repositories') {
 		const user = await db.user.findUnique({
