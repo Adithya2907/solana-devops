@@ -33,12 +33,13 @@ async function getUser(login: string): Promise<(User & {
 	return user;
 }
 
-async function createBuild(commit: string, listener: number): Promise<Build> {
+async function createBuild(commit: string, listener: number, issue: number | null = null): Promise<Build> {
 	const build = db.build.create({
 		data: {
 			commit,
 			started: new Date(),
-			listenerID: listener
+			listenerID: listener,
+			issue
 		}
 	});
 
@@ -111,7 +112,7 @@ export const POST = (async ({ request }) => {
 		const listener = repository?.listeners.find(listener => listener.branch === body.pull_request.base.ref);
 
 		if (listener !== undefined) {
-			const repoBuild = await createBuild(body.after, listener.id);
+			const repoBuild = await createBuild(body.after, listener.id, body.pull_request.number);
 
 			await app?.rest.issues.createComment({
 				owner: repo.owner.login,
