@@ -133,8 +133,6 @@ export const POST = (async ({ request }) => {
 			try {
 				const result = await build(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
 
-				console.log(result.log.length);
-
 				app?.rest.checks.update({
 					owner: repo.owner.login,
 					repo: repo.name,

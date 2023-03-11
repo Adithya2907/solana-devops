@@ -95,10 +95,6 @@ export async function build(owner: string, repo: string, commit: string, install
 
     outputStream.push(`found versions ${process.env['_BUILD_RUST_VERSION']} ${process.env['_BUILD_ANCHOR_VERSION']}`);
 
-    outputStream.push("\nCopying dependencies");
-    fs.copyFileSync(path.join(platform, "Dockerfile"), path.join(PUBLIC_REPO_PATH, "Dockerfile"));
-    fs.copyFileSync(path.join(platform, "solana-install.sh"), path.join(extracted, "install.sh"), fs.constants.X_OK);
-
     console.log("Building repo using ", path.join(platform, "build.sh"));
 
     const buildProcess = childProcess.execSync(`. ${path.join(platform, 'build.sh')}`).toString("utf-8");
@@ -112,11 +108,11 @@ export async function build(owner: string, repo: string, commit: string, install
         region: 'ap-south-1'
     });
 
-    const idls = fs.readdirSync(path.join(PUBLIC_REPO_PATH, "artifacts", "idl"));
+    const idls = fs.readdirSync(path.join(PUBLIC_REPO_PATH, "repo", "target", "idl"));
     const idlkeys: Array<string> = [];
     idls
         .map(idl =>
-            path.join(PUBLIC_REPO_PATH, "artifacts", "idl", idl))
+            path.join(PUBLIC_REPO_PATH, "repo", "target", "idl", idl))
         .forEach(async (idl) => {
             try {
                 const key = Date.now() + "_" + path.basename(idl);
