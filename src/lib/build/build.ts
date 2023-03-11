@@ -116,14 +116,16 @@ export async function build(owner: string, repo: string, commit: string, install
         .forEach(async (idl) => {
             try {
                 const key = Date.now() + "_" + path.basename(idl);
-
+                
+                console.log(key);
+                idlkeys.push(key);
+                console.log(idlkeys);
+                
                 await s3.putObject({
                     Bucket: 'idl-files',
                     Body: fs.createReadStream(idl),
                     Key: key,
                 });
-
-                idlkeys.push(key);
             } catch (err) {
                 outputStream.push("ERROR: Could not upload IDL to S3");
                 outputStream.push("DESCRIPTION: " + err.message);
@@ -133,7 +135,7 @@ export async function build(owner: string, repo: string, commit: string, install
         });
 
     let logupload: string;
-    
+
     buildResult.log = readStream(outputStream);
 
     try {
@@ -155,13 +157,17 @@ export async function build(owner: string, repo: string, commit: string, install
 
     buildResult.status = true;
 
-    await db.iDL.createMany({
+    console.log(idls, idlkeys);
+
+    const idlresult = await db.iDL.createMany({
         data: idlkeys.map((key, index) => ({
             program: idls[index].split('.')[0],
             key,
             buildId: repoBuild.id
         }))
     });
+
+    console.log(idlresult);
 
     await db.build.update({
         where: {

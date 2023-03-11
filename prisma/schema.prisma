@@ -61,6 +61,7 @@ model Build {
   ended DateTime?
 
   idls IDL[]
+  deploys Deploy[]
 
   listener Listener? @relation(fields: [listenerID], references: [id])
   listenerID Int?
@@ -69,9 +70,16 @@ model Build {
 model Deploy {
   id Int @id @default(autoincrement())
 
-  //TODO: include support for versioning and tagging
+  log String?
+  deployed DateTime?
 
   idls IDL[]
+
+  status BuildStatus @default(QUEUED)
+  conclusion BuildConclusion?
+
+  build Build? @relation(fields: [buildID], references: [id])
+  buildID Int?
 
   listener Listener? @relation(fields: [listenerID], references: [id])
   listenerID Int
@@ -81,13 +89,17 @@ model IDL {
   id Int @id @default(autoincrement())
 
   program String
-  key String
+  key String @unique
+  programid String?
 
   build Build? @relation(fields: [buildId], references: [id])
   buildId Int? 
 
   deploy Deploy? @relation(fields: [deployId], references: [id])
   deployId Int? @unique
+
+  @@unique([buildId, program])
+  @@unique([deployId, program])
 }
 
 enum RepoState {

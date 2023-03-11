@@ -8,45 +8,46 @@ import { AWS_S3_ACCESS_KEY, AWS_S3_SECRET_KEY } from '$env/static/private';
 
 import db from '$lib/db/client';
 
-export const load = (async ({ params, parent }) => {
+export const load = (async ({ parent, params }) => {
     const { repo } = await parent();
     const id = params.id;
 
-    const build = await db.build.findUnique({
+    const deploy = await db.deploy.findUnique({
         where: {
             id: parseInt(id)
         },
         include: {
+            build: true,
             listener: true,
-            idls: true,
-            deploys: true
+            idls: true
         }
     });
 
-    const s3 = new AWS.S3({
-        credentials: {
-            accessKeyId: AWS_S3_ACCESS_KEY,
-            secretAccessKey: AWS_S3_SECRET_KEY
-        },
-        region: 'ap-south-1'
-    });
-
-    if (build === null || build?.listener?.repoID !== repo?.id)
+    if (deploy === null || deploy?.listener?.repoID !== repo?.id)
         throw error(404, 'Could not find build');
 
-    let log = null;
+    let log: string | null = null;
 
-    if (build.log) {
+    if (deploy.log) {
+        const s3 = new AWS.S3({
+            credentials: {
+                accessKeyId: AWS_S3_ACCESS_KEY,
+                secretAccessKey: AWS_S3_SECRET_KEY
+            },
+            region: 'ap-south-1'
+        });
+
         const result = await s3.getObject({
             Bucket: 'idl-files',
-            Key: build.log
+            Key: deploy.log
         });
-    
-        log = await result.Body?.transformToString();
+
+        log = (await result.Body?.transformToString()) ?? '';
     }
 
     return {
-        build,
+        deploy,
         log
     };
+
 }) satisfies PageServerLoad;
