@@ -1,4 +1,4 @@
-import { BuildConclusion, BuildStatus, DeployTarget, type Build, type Listener } from '@prisma/client';
+import { BuildConclusion, BuildStatus, DeployTarget, type Build, type Listener, type Deploy } from '@prisma/client';
 
 import path from 'node:path';
 import stream from 'node:stream';
@@ -17,6 +17,7 @@ import { PUBLIC_REPO_PATH } from '$env/static/public';
 export type DeployResult = {
     status: boolean;
     log: string;
+    deploy: Deploy;
 };
 
 const TargetMapping: Record<DeployTarget, string> = {
@@ -45,12 +46,6 @@ export async function deploy(owner: string, repo: string, commit: string, instal
         encoding: "utf-8",
     });
 
-    const result: DeployResult = {
-        status: false,
-        log: ""
-    };
-
-
     const instance = await get(app).octokit?.getInstallationOctokit(installation);
 
     const deployment = await db.deploy.create({
@@ -60,6 +55,12 @@ export async function deploy(owner: string, repo: string, commit: string, instal
             deployed: new Date()
         }
     });
+
+    const result: DeployResult = {
+        status: false,
+        log: "",
+        deploy: deployment
+    };
 
     const check = await instance?.rest.checks.create({
         owner,

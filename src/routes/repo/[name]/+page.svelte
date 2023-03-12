@@ -83,6 +83,33 @@
 		<option value="TEST">testnet</option>
 		<option value="PROD">mainnet</option>
 	</select>
+	<br>
+	<input checked name="deployfe" type="checkbox" />
+	<label>Deploy frontend</label>
+	<br>
+	<label>Frontend Deploy Plugin</label>
+	<select name="feplugin" placeholder="netlify">
+		<option value="netlify">Netlify</option>
+		<option value="vercel" disabled>Vercel</option>
+	</select>
+	<br>
+	<label>Frontend Deploy Target</label>
+	<input name="fetarget" type="text" placeholder="site name" />
+	<br>
+	<label>Plugin API Key</label>
+	<input name="fekey" type="text" placeholder="API key">
+	<br>
+	<label>Frontend Directory</label>
+	<input name="fedir" value="app">
+	<br>
+	<label>Frontend IDL Directory</label>
+	<input name="feidl" value="app/idl">
+	<br>
+	<label>Frontend Build Command <small>Use {"{{cluster}}"} to get cluster</small></label>
+	<input name="febuild" value="npm run build">
+	<br>
+	<label>Frontend Build Directory</label>
+	<input name="feoutput" value="app/build">
 	<input name="repoID" class="hidden" type="number" value={data.repo?.id} />
 	<br /><button type="submit">Create</button>
 </form>
