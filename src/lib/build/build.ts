@@ -95,10 +95,6 @@ export async function build(owner: string, repo: string, commit: string, install
 
     outputStream.push(`found versions ${process.env['_BUILD_RUST_VERSION']} ${process.env['_BUILD_ANCHOR_VERSION']}`);
 
-    outputStream.push("\nCopying dependencies");
-    fs.copyFileSync(path.join(platform, "Dockerfile"), path.join(PUBLIC_REPO_PATH, "Dockerfile"));
-    fs.copyFileSync(path.join(platform, "solana-install.sh"), path.join(extracted, "install.sh"), fs.constants.X_OK);
-
     console.log("Building repo using ", path.join(platform, "build.sh"));
 
     const buildProcess = childProcess.execSync(`. ${path.join(platform, 'build.sh')}`).toString("utf-8");
@@ -112,22 +108,24 @@ export async function build(owner: string, repo: string, commit: string, install
         region: 'ap-south-1'
     });
 
-    const idls = fs.readdirSync(path.join(PUBLIC_REPO_PATH, "artifacts", "idl"));
+    const idls = fs.readdirSync(path.join(PUBLIC_REPO_PATH, "repo", "target", "idl"));
     const idlkeys: Array<string> = [];
     idls
         .map(idl =>
-            path.join(PUBLIC_REPO_PATH, "artifacts", "idl", idl))
+            path.join(PUBLIC_REPO_PATH, "repo", "target", "idl", idl))
         .forEach(async (idl) => {
             try {
                 const key = Date.now() + "_" + path.basename(idl);
-
+                
+                console.log(key);
+                idlkeys.push(key);
+                console.log(idlkeys);
+                
                 await s3.putObject({
                     Bucket: 'idl-files',
                     Body: fs.createReadStream(idl),
                     Key: key,
                 });
-
-                idlkeys.push(key);
             } catch (err) {
                 outputStream.push("ERROR: Could not upload IDL to S3");
                 outputStream.push("DESCRIPTION: " + err.message);
@@ -137,7 +135,7 @@ export async function build(owner: string, repo: string, commit: string, install
         });
 
     let logupload: string;
-    
+
     buildResult.log = readStream(outputStream);
 
     try {
@@ -159,13 +157,17 @@ export async function build(owner: string, repo: string, commit: string, install
 
     buildResult.status = true;
 
-    await db.iDL.createMany({
+    console.log(idls, idlkeys);
+
+    const idlresult = await db.iDL.createMany({
         data: idlkeys.map((key, index) => ({
             program: idls[index].split('.')[0],
             key,
             buildId: repoBuild.id
         }))
     });
+
+    console.log(idlresult);
 
     await db.build.update({
         where: {

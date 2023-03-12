@@ -8,6 +8,9 @@ import { get } from 'svelte/store';
 import { error, json } from '@sveltejs/kit';
 
 import { build } from '$lib/build/build';
+import { deploy } from '$lib/build/deploy';
+import { fe } from '$lib/build/fe';
+import { clean } from '$lib/build/clean';
 
 import db from '$lib/db/client';
 import GHApp from '$lib/stores/app.server';
@@ -33,13 +36,16 @@ async function getUser(login: string): Promise<(User & {
 	return user;
 }
 
-async function createBuild(commit: string, listener: number, issue: number | null = null): Promise<Build> {
+async function createBuild(commit: string, listener: number, issue: number | null = null): Promise<Build & { listener: Listener | null }> {
 	const build = db.build.create({
 		data: {
 			commit,
 			started: new Date(),
 			listenerID: listener,
 			issue
+		},
+		include: {
+			listener: true
 		}
 	});
 
@@ -133,8 +139,6 @@ export const POST = (async ({ request }) => {
 			try {
 				const result = await build(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
 
-				console.log(result.log.length);
-
 				app?.rest.checks.update({
 					owner: repo.owner.login,
 					repo: repo.name,
@@ -155,9 +159,23 @@ export const POST = (async ({ request }) => {
 					issue_number: body.pull_request.number,
 					body: result.status ? 'Build completed successfully!' : 'Build failed! View check logs for details'
 				});
+
+				if (result.status && listener.autodeploy) {
+					const result = await deploy(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
+					console.log(listener.deployfe);
+					console.log(listener);
+
+					if (listener.deployfe && result.status) {
+						console.log('deploying fe');
+						const feresult = await fe(repo.owner.login, repo.name, body.after, installation.id, repoBuild, result.deploy);
+						console.log(feresult);
+					}
+				}
 			} catch (e) {
 				console.log(e);
 			}
+
+			clean();
 		}
 	} else if (event === 'installation_repositories') {
 		const user = await db.user.findUnique({

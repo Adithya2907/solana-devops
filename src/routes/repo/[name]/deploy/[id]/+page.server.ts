@@ -8,20 +8,27 @@ import { AWS_S3_ACCESS_KEY, AWS_S3_SECRET_KEY } from '$env/static/private';
 
 import db from '$lib/db/client';
 
-export const load = (async ({ params, parent }) => {
+export const load = (async ({ parent, params }) => {
     const { repo } = await parent();
     const id = params.id;
 
-    const build = await db.build.findUnique({
+    const deploy = await db.deploy.findUnique({
         where: {
             id: parseInt(id)
         },
         include: {
+            build: true,
             listener: true,
             idls: true,
-            deploys: true
+            frontendDeploy: true
         }
     });
+
+    if (deploy === null || deploy?.listener?.repoID !== repo?.id)
+        throw error(404, 'Could not find build');
+
+    let log: string | null = null;
+    let felog: string | null = null;
 
     const s3 = new AWS.S3({
         credentials: {
@@ -31,22 +38,28 @@ export const load = (async ({ params, parent }) => {
         region: 'ap-south-1'
     });
 
-    if (build === null || build?.listener?.repoID !== repo?.id)
-        throw error(404, 'Could not find build');
-
-    let log = null;
-
-    if (build.log) {
+    if (deploy.log) {
         const result = await s3.getObject({
             Bucket: 'idl-files',
-            Key: build.log
+            Key: deploy.log
         });
-    
-        log = await result.Body?.transformToString();
+
+        log = (await result.Body?.transformToString()) ?? '';
+    }
+
+    if (deploy.frontendDeploy && deploy.frontendDeploy.log) {
+        const result = await s3.getObject({
+            Bucket: 'idl-files',
+            Key: deploy.frontendDeploy.log
+        });
+
+        felog = (await result.Body?.transformToString()) ?? '';
     }
 
     return {
-        build,
-        log
+        deploy,
+        log,
+        felog
     };
+
 }) satisfies PageServerLoad;

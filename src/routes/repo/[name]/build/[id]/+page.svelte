@@ -16,15 +16,33 @@
 		<a href="{data.repo.url}/issues/{data.build.issue}">View on github</a>
 	{/if}
 </p>
+{#if data.build.idls}
+	<p>Programs</p>
+	{#each data.build.idls as idl}
+		<p>
+			{idl.program} - <a href="/idl/{idl.id}">View Documentation</a>
+		</p>
+	{/each}
+{/if}
+{#if data.build.deploys}
+	<p>Deploys</p>
+	{#each data.build.deploys as deploy}
+		<p>
+			<a href="/repo/{data.repo.name}/deploy/{deploy.id}">Deploy {deploy.id}</a> - {deploy.status} ({deploy.conclusion})
+		</p>
+	{/each}
+{/if}
 <p>
 	{#if data.build.listener.type == ListenerType.PULL_REQUEST}{/if}
 </p>
-<p>Build logs</p>
-<pre>
-	{#each data.log as line}
-		{line}
-	{/each}
-</pre>
+{#if data.log}
+	<p>Build logs</p>
+	<pre>
+		{#each data.log as line}
+			{line}
+		{/each}
+	</pre>
+{/if}
 
 <style>
 	pre {

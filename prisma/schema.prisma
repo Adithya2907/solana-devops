@@ -38,6 +38,10 @@ model Listener {
   autodeploy Boolean @default(true)
   deploytarget DeployTarget
 
+  deployfe Boolean @default(false)
+  feplugin Plugin? @relation(fields: [fepluginID], references: [id])
+  fepluginID Int?
+
   builds Build[]
   deploys Deploy[]
 
@@ -61,6 +65,7 @@ model Build {
   ended DateTime?
 
   idls IDL[]
+  deploys Deploy[]
 
   listener Listener? @relation(fields: [listenerID], references: [id])
   listenerID Int?
@@ -69,25 +74,63 @@ model Build {
 model Deploy {
   id Int @id @default(autoincrement())
 
-  //TODO: include support for versioning and tagging
+  log String?
+  deployed DateTime?
 
   idls IDL[]
 
+  status BuildStatus @default(QUEUED)
+  conclusion BuildConclusion?
+
+  build Build? @relation(fields: [buildID], references: [id])
+  buildID Int?
+
   listener Listener? @relation(fields: [listenerID], references: [id])
   listenerID Int
+
+  frontendDeploy FrontendDeploy? @relation(fields: [frontendDeployID], references: [id])
+  frontendDeployID Int? @unique
 }
 
 model IDL {
   id Int @id @default(autoincrement())
 
   program String
-  key String
+  key String @unique
+  programid String?
 
   build Build? @relation(fields: [buildId], references: [id])
   buildId Int? 
 
   deploy Deploy? @relation(fields: [deployId], references: [id])
   deployId Int? @unique
+
+  @@unique([buildId, program])
+  @@unique([deployId, program])
+}
+
+model Plugin {
+  id Int @id @default(autoincrement())
+
+  name String
+  key String 
+  target String
+  dir String
+  idl String
+  command String
+  output String
+
+  listener Listener[]
+}
+
+model FrontendDeploy {
+  id Int @id @default(autoincrement())
+
+  log String?
+  url String?
+  deployed DateTime?
+
+  deploy Deploy?
 }
 
 enum RepoState {
