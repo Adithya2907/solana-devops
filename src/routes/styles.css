@@ -13,6 +13,10 @@
 	--column-margin-top: 4rem;
 	font-family: var(--font-body);
 	color: var(--color-text);
+
+	--solana-primary: #161B19;
+	--solana-secondary: #1E2423;
+	--solana-accent: #1DD79B;
 }
 
 body {

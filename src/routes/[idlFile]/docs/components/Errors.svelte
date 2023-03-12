@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { IDL } from '../IDL';
+	import type { IDL } from '../../IDL';
 	export let idl: IDL;
 </script>
 
