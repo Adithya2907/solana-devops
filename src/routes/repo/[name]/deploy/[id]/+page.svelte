@@ -15,11 +15,22 @@
 		<a href="{data.repo.url}/issues/{data.deploy.build.issue}">View on github</a>
 	{/if}
 </p>
+{#if data.deploy.frontendDeploy}
+	<p>Frontend Deployed at: <a href={data.deploy.frontendDeploy.url}>URL</a></p>
+{/if}
 <p><a href="/repo/{data.repo.name}/build/{data.deploy.build.id}">Build</a></p>
 {#if data.log}
-	<p>Build logs</p>
+	<p>Deploy logs</p>
 	<pre>
 		{#each data.log as line}
+			{line}
+		{/each}
+	</pre>
+{/if}
+{#if data.felog}
+	<p>Frontend Deploy logs</p>
+	<pre>
+		{#each data.felog as line}
 			{line}
 		{/each}
 	</pre>
@@ -32,6 +43,7 @@
 		</p>
 	{/each}
 {/if}
+
 <style>
 	pre {
 		background: black;

@@ -38,6 +38,10 @@ model Listener {
   autodeploy Boolean @default(true)
   deploytarget DeployTarget
 
+  deployfe Boolean @default(false)
+  feplugin Plugin? @relation(fields: [fepluginID], references: [id])
+  fepluginID Int?
+
   builds Build[]
   deploys Deploy[]
 
@@ -83,6 +87,9 @@ model Deploy {
 
   listener Listener? @relation(fields: [listenerID], references: [id])
   listenerID Int
+
+  frontendDeploy FrontendDeploy? @relation(fields: [frontendDeployID], references: [id])
+  frontendDeployID Int? @unique
 }
 
 model IDL {
@@ -100,6 +107,30 @@ model IDL {
 
   @@unique([buildId, program])
   @@unique([deployId, program])
+}
+
+model Plugin {
+  id Int @id @default(autoincrement())
+
+  name String
+  key String 
+  target String
+  dir String
+  idl String
+  command String
+  output String
+
+  listener Listener[]
+}
+
+model FrontendDeploy {
+  id Int @id @default(autoincrement())
+
+  log String?
+  url String?
+  deployed DateTime?
+
+  deploy Deploy?
 }
 
 enum RepoState {

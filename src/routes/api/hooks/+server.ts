@@ -9,6 +9,8 @@ import { error, json } from '@sveltejs/kit';
 
 import { build } from '$lib/build/build';
 import { deploy } from '$lib/build/deploy';
+import { fe } from '$lib/build/fe';
+import { clean } from '$lib/build/clean';
 
 import db from '$lib/db/client';
 import GHApp from '$lib/stores/app.server';
@@ -159,12 +161,21 @@ export const POST = (async ({ request }) => {
 				});
 
 				if (result.status && listener.autodeploy) {
-					const result = deploy(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
-					console.log(result.log);
+					const result = await deploy(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
+					console.log(listener.deployfe);
+					console.log(listener);
+
+					if (listener.deployfe && result.status) {
+						console.log('deploying fe');
+						const feresult = await fe(repo.owner.login, repo.name, body.after, installation.id, repoBuild, result.deploy);
+						console.log(feresult);
+					}
 				}
 			} catch (e) {
 				console.log(e);
 			}
+
+			clean();
 		}
 	} else if (event === 'installation_repositories') {
 		const user = await db.user.findUnique({
