@@ -1,23 +1,18 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import '../../styles.css';
-	export let data;
-	import type { IDL } from '../IDL';
-	import { Tabs } from 'teil-ui';
-	let error = false;
 
-	let idl: IDL;
-	if (data.idlJson == 'ERROR') {
-		error = true;
-	} else {
-		idl = JSON.parse(data.idlJson);
-	}
+	import { Tabs } from 'teil-ui';
+
 	import Instructions from './components/Instructions.svelte';
 	import Accounts from './components/Accounts.svelte';
 	import Types from './components/Types.svelte';
 	import Errors from './components/Errors.svelte';
 	import Constants from './components/Constants.svelte';
 	import Events from './components/Events.svelte';
+
+	export let data: PageData;
+
+	let error = false;
 </script>
 
 <main>
@@ -26,7 +21,7 @@
 		<h1>An error occured!</h1>
 	{:else}
 		<h1>IDL API Docs</h1>
-		<h3 class="idl-name text-center">{idl.name}</h3>
+		<h3 class="idl-name text-center">{data.json.name}</h3>
 
 		<Tabs.Container class="tabs__container" value="1" slot="component">
 			<Tabs.List class="tabs__list">
@@ -38,15 +33,15 @@
 				<Tabs.Trigger value="6" class="tabs__trigger">Events</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content value="1" class="tabs__content">
-				<Instructions {idl} />
+				<Instructions idl={data.json} />
 			</Tabs.Content>
-			<Tabs.Content value="2" class="tabs__content"><Accounts {idl} /></Tabs.Content>
-			<Tabs.Content value="3" class="tabs__content"><Types {idl} /></Tabs.Content>
-			<Tabs.Content value="4" class="tabs__content"><Errors {idl} /></Tabs.Content>
+			<Tabs.Content value="2" class="tabs__content"><Accounts idl={data.json} /></Tabs.Content>
+			<Tabs.Content value="3" class="tabs__content"><Types idl={data.json} /></Tabs.Content>
+			<Tabs.Content value="4" class="tabs__content"><Errors idl={data.json} /></Tabs.Content>
 			<Tabs.Content value="5" class="tabs__content">
-				<Constants {idl} />
+				<Constants idl={data.json} />
 			</Tabs.Content>
-			<Tabs.Content value="6" class="tabs__content"><Events {idl} /></Tabs.Content>
+			<Tabs.Content value="6" class="tabs__content"><Events idl={data.json} /></Tabs.Content>
 		</Tabs.Container>
 	{/if}
 </main>
