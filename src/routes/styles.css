@@ -13,6 +13,13 @@
 	--column-margin-top: 4rem;
 	font-family: var(--font-body);
 	color: var(--color-text);
+
+	--solana-primary: #161B19;
+	--solana-secondary: #1E2423;
+	--solana-accent: #1DD79B;
+	--solana-grey: #5b5f5d;
+
+	--line-color: #282d2b;
 }
 
 body {
@@ -110,6 +117,10 @@ button:focus:not(:focus-visible) {
 	white-space: nowrap;
 }
 
+.content {
+	max-width: 60%;
+	margin: 0 auto;
+}
 .text-center {
 	text-align: center;
 }
@@ -242,4 +253,20 @@ button:focus:not(:focus-visible) {
 	outline: none;
 	color: white;
 	border-bottom: 1px solid #26e97e;
+}
+
+/* HOME */
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+ul {
+	list-style-type: none;
+}
+
+ul a {
+	text-decoration: none;
+	color: var(--solana-accent);
 }

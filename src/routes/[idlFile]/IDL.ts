@@ -1,3 +1,5 @@
+import type { Keypair } from "@solana/web3.js";
+
 export interface IDL {
 	name: string;
 	errors?: Error[];
@@ -15,7 +17,16 @@ export type Instruction = {
 	accounts: IdlAccountItem[];
 	args: IdlField[];
 	returns?: IdlType;
+	accountValues?: CustomAccountType[];
+	argumentvalues?: string[];
 };
+
+export type CustomAccountType = {
+	value: string;
+	keypair: Keypair | null;
+	generateKeypair: boolean;
+	accountType: number; // 0 --> public key, 1 --> generate keypair, 2 --> sysprogram
+}
 
 export type IdlAccountItem = IdlAccount | IdlAccounts;
 

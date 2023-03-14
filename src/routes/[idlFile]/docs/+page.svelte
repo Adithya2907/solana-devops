@@ -1,7 +1,8 @@
 <script lang="ts">
+	import type { PageData } from './$types';
 	import '../../styles.css';
 	export let data;
-	import type { IDL } from './IDL';
+	import type { IDL } from '../IDL';
 	import { Tabs } from 'teil-ui';
 	let error = false;
 

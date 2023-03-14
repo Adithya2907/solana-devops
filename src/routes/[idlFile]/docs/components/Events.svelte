@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { update_keyed_each } from 'svelte/internal';
-	import { IdlTypeToString, type IDL } from '../IDL';
+	import { IdlTypeToString, type IDL } from '../../IDL';
 	export let idl: IDL;
 </script>
 

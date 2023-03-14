@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { IdlTypeToString, IsMut, IsSigner, type IDL } from '../IDL';
+	import { IdlTypeToString, IsMut, IsSigner, type IDL } from '../../IDL';
 	export let idl: IDL;
 </script>
 

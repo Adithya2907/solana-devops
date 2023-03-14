@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Separator } from 'teil-ui';
-	import { IdlTypeToString, type IDL } from '../IDL';
+	import { IdlTypeToString, type IDL } from '../../IDL';
 	export let idl: IDL;
 </script>
 
