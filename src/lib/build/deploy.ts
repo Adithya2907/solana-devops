@@ -1,5 +1,6 @@
 import { BuildConclusion, BuildStatus, DeployTarget, type Build, type Listener, type Deploy } from '@prisma/client';
 
+import fs from 'node:fs';
 import path from 'node:path';
 import stream from 'node:stream';
 import childProcess from 'node:child_process';
@@ -78,13 +79,20 @@ export async function deploy(owner: string, repo: string, commit: string, instal
     process.env['_BUILD_CLUSTER'] = cluster;
     process.env['_BUILD_REPO_PATH'] = extracted;
 
+    const s3 = new AWS.S3({
+        credentials: {
+            accessKeyId: AWS_S3_ACCESS_KEY,
+            secretAccessKey: AWS_S3_SECRET_KEY
+        },
+        region: 'ap-south-1'
+    });
+
     try {
         const deployProcess = childProcess.execSync(`. ${path.join(platform, 'deploy.sh')}`).toString();
         const lines = deployProcess.split('\n');
         const programs: Record<string, string> = {};
 
         lines.forEach((line, index) => {
-            console.log(line);
             if (line.includes('Deploying program')) {
                 const program = line.split('Deploying program ')[1].split('...')[0].replace('"', '');
                 const id = lines[index + 2].split('Program Id: ')[1];
@@ -99,7 +107,21 @@ export async function deploy(owner: string, repo: string, commit: string, instal
 
         console.log(programs, build.id);
 
-        const updates = Object.keys(programs).map(program => 
+        const idlfiles = fs.readdirSync(path.join(PUBLIC_REPO_PATH, "repo", "target", "idl"));
+        const idlkeys: Record<string, string> = {};
+
+        idlfiles.forEach(async idlfile => {
+            const idlkey = Date.now() + '_' + path.basename(idlfile);
+            idlkeys[path.basename(idlfile)] = idlkey;
+
+            await s3.putObject({
+                Bucket: 'idl-files',
+                Body: fs.createReadStream(path.join(PUBLIC_REPO_PATH, "repo", "target", "idl", idlfile)),
+                Key: idlkey
+            });
+        });
+
+        const updates = Object.keys(programs).map(program =>
             db.iDL.updateMany({
                 where: {
                     buildId: build.id,
@@ -107,7 +129,8 @@ export async function deploy(owner: string, repo: string, commit: string, instal
                 },
                 data: {
                     programid: programs[program],
-                    deployId: deployment.id
+                    deployId: deployment.id,
+                    key: idlkeys[program.replace('-', '_')]
                 }
             })
         );
@@ -131,14 +154,6 @@ export async function deploy(owner: string, repo: string, commit: string, instal
                 summary: result.status ? 'Deployed successfully!' : 'Deploy failed',
                 text: result.log
             }
-        });
-
-        const s3 = new AWS.S3({
-            credentials: {
-                accessKeyId: AWS_S3_ACCESS_KEY,
-                secretAccessKey: AWS_S3_SECRET_KEY
-            },
-            region: 'ap-south-1'
         });
 
         const key = Date.now() + "_" + commit + '_build';
