@@ -44,14 +44,10 @@ export const load = (async ({ params }) => {
 
     const file = await result.Body?.transformToString();
 
-    console.log(file);
-
     if (file === undefined)
         throw error(404, 'Could not find IDL file');
 
     const json: IDL = await JSON.parse(file) as IDL;
-
-    console.log(json);
 
     return {
         idl,

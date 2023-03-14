@@ -7,9 +7,9 @@ export const UserCookie = 'user';
 export const UserCookieOptions: CookieSerializeOptions = {
     path: '/',
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: 'none',
     maxAge: 60 * 60 * 24 * 30,
-    secure: false
+    secure: true
 };
 
 export const UserCookieActions = {

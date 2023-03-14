@@ -193,7 +193,7 @@ export const POST = (async ({ request }) => {
 				console.log(e);
 			}
 
-			clean();
+			//clean();
 		}
 	} else if (event === 'installation_repositories') {
 		const user = await db.user.findUnique({

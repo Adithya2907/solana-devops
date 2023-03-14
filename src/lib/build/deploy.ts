@@ -97,15 +97,11 @@ export async function deploy(owner: string, repo: string, commit: string, instal
                 const program = line.split('Deploying program ')[1].split('...')[0].replace('"', '');
                 const id = lines[index + 2].split('Program Id: ')[1];
 
-                console.log(program, id);
-
                 programs[program.replace('"', '')] = id;
             }
         });
 
         outputStream.push(deployProcess);
-
-        console.log(programs, build.id);
 
         const idlfiles = fs.readdirSync(path.join(PUBLIC_REPO_PATH, "repo", "target", "idl"));
         const idlkeys: Record<string, string> = {};
@@ -130,7 +126,7 @@ export async function deploy(owner: string, repo: string, commit: string, instal
                 data: {
                     programid: programs[program],
                     deployId: deployment.id,
-                    key: idlkeys[program.replace('-', '_')]
+                    key: idlkeys[program.replace('-', '_') + '.json']
                 }
             })
         );

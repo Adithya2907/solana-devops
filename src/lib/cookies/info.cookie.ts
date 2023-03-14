@@ -5,7 +5,7 @@ export const InfoCookie = 'info';
 export const InfoCookieOptions: CookieSerializeOptions = {
     path: '/',
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: 'none',
     maxAge: 60 * 60 * 24 * 30,
-    secure: false
+    secure: true
 };

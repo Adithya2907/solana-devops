@@ -1,6 +1,6 @@
 datasource db {
   provider = "mysql"
-  url      = "mysql://fqea1xgq429gjsilxo92:pscale_pw_3uWPiOMO991qtBKb4R8jVGtCmTPCgRcZKFNKwtjP4SX@ap-south.connect.psdb.cloud/solstrommdev?sslaccept=strict"
+  url      = "mysql://3p8reqwhrsfu4cvxwjco:pscale_pw_pL7kNFEBxBTfnoRBJoAYsrDZCjRYFsRi7sIAr22Xaxh@ap-south.connect.psdb.cloud/solstrommprod?sslaccept=strict"
   relationMode = "prisma"
 }
 

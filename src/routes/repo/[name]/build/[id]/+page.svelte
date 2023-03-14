@@ -5,101 +5,102 @@
 	export let data: PageData;
 </script>
 
-<Header/>
+<Header />
 <div class="content">
 	<div class="back">
 		<a href="/repo/{data.repo.name}">
-			<i class="fa-solid fa-arrow-left-long" style="margin-right: 10px"></i>Back
+			<i class="fa-solid fa-arrow-left-long" style="margin-right: 10px" />Back
 		</a>
 	</div>
 	<h1>Build</h1>
 	<div class="wrapper">
 		<div class="left">
-
 			<div class="grid-item">
 				<h2>
-				<i class="fa-solid fa-magnifying-glass"></i>
-					
-					Status</h2>
+					<i class="fa-solid fa-magnifying-glass" />
+
+					Status
+				</h2>
 				<p>{data.build.status}</p>
 			</div>
 			<div class="grid-item">
-
 				<h2>
-					<i class="fa-solid fa-file"></i>
-					Conclusion</h2>
+					<i class="fa-solid fa-file" />
+					Conclusion
+				</h2>
 				<p>{data.build.conclusion}</p>
 			</div>
 			<div class="grid-item">
-
 				<h2>
-					<i class="fa-solid fa-fingerprint"></i>
-					Type</h2>
+					<i class="fa-solid fa-fingerprint" />
+					Type
+				</h2>
 				<p>{data.build.listener.type}</p>
 			</div>
 			<div class="grid-item">
-
 				<h2>
-					<i class="fa-solid fa-clock"></i>
-					Started</h2>
+					<i class="fa-solid fa-clock" />
+					Started
+				</h2>
 				<p>{data.build.started}</p>
 			</div>
 			<div class="grid-item">
-
 				<h2>
-					<i class="fa-solid fa-flag-checkered"></i>
-					Ended</h2>
+					<i class="fa-solid fa-flag-checkered" />
+					Ended
+				</h2>
 				<p>{data.build.ended}</p>
 			</div>
-			
 
 			<p>
 				{#if data.build.listener.type == 'PULL_REQUEST'}
 					<a href="{data.repo.url}/issues/{data.build.issue}">
-				<i class="fa-solid fa-arrow-up-right-from-square"></i>
-						
-						View on github</a>
+						<i class="fa-solid fa-arrow-up-right-from-square" />
+
+						View on github</a
+					>
 				{/if}
 			</p>
 			{#if data.build.idls}
-				<a href="/{data.repo.name}/docs">
-				<i class="fa-solid fa-arrow-up-right-from-square"></i>
-					
-					Programs</a>
-				{#each data.build.idls as idl}
-					<p>
-						{idl.program} - <a href="/idl/{idl.id}/docs">View Documentation</a>
-					</p>
-				{/each}
+				<p class="m-0">Programs</p>
+				<ul>
+					{#each data.build.idls as idl}
+						<li>{idl.program} - <a href="/idl/{idl.id}/docs">View Documentation</a></li>
+					{/each}
+				</ul>
 			{/if}
 			{#if data.build.deploys}
-				<p>Deploys</p>
-				{#each data.build.deploys as deploy}
-					<p>
-						<i class="fa-solid fa-up-right-from-square"></i>
-						<a href="/repo/{data.repo.name}/deploy/{deploy.id}">
-							<i class="fa-solid fa-arrow-up-right-from-square"></i>
-							Deploy {deploy.id}</a> - {deploy.status} ({deploy.conclusion})
-					</p>
-				{/each}
+				<p class="m-0">Deploys</p>
+				<ul>
+					{#each data.build.deploys as deploy}
+						<li>
+							<a href="/repo/{data.repo.name}/deploy/{deploy.id}">
+								<i class="fa-solid fa-arrow-up-right-from-square" />
+								Deploy {deploy.id}</a
+							>
+							- {deploy.status} ({deploy.conclusion})
+						</li>
+					{/each}
+				</ul>
 			{/if}
 		</div>
 		<div class="right">
-
+			<h2>Build logs</h2>
 			{#if data.log}
-				<p>Build logs</p>
 				<pre>
 					{#each data.log as line}
-					{line}
+						{line}
 					{/each}
 				</pre>
 			{/if}
 		</div>
 	</div>
-
 </div>
 
 <style>
+	.m-0, ul {
+		margin: 0;
+	}
 	.back {
 		color: var(--solana-accent);
 	}
@@ -110,11 +111,14 @@
 		color: var(--solana-accent);
 	}
 	pre {
-		background: black;
+		background: transparent;
+		outline: none;
+		border: none;
+		box-shadow: none;
 		color: white;
 		white-space: pre-wrap;
-		height: 200px;
-		width: 50%;
+		max-height: 60vh;
+		width: 100%;
 		overflow: scroll;
 	}
 
@@ -140,7 +144,8 @@
 	}
 
 	.right {
-		border: 2px solid grey;
+		border: 1px solid var(--solana-grey);
+		padding-left: 5px;
 	}
 
 	.grid-item {
