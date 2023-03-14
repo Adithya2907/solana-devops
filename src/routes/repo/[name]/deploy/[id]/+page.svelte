@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { ListenerType } from '@prisma/client';
 
 	export let data: PageData;
 </script>
@@ -11,7 +10,7 @@
 <p>Type: {data.deploy.listener.type}</p>
 <p>Deployed: {data.deploy.deployed}</p>
 <p>
-	{#if data.deploy.listener.type == ListenerType.PULL_REQUEST}
+	{#if data.deploy.listener.type == 'PULL_REQUEST'}
 		<a href="{data.repo.url}/issues/{data.deploy.build.issue}">View on github</a>
 	{/if}
 </p>

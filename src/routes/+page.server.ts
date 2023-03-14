@@ -1,4 +1,4 @@
-import type {Actions} from './$types';
+import type { Actions } from './$types';
 import type { UserState } from '$lib//types/user.cookie';
 
 import { get } from 'svelte/store';
@@ -13,6 +13,7 @@ import { getCookie, setCookie } from '$lib/cookie';
 import { Octokit } from 'octokit';
 
 import db from '$lib/db/client';
+import { invalidate } from '$app/navigation';
 
 export const actions = {
     login: async ({ cookies }) => {
@@ -58,12 +59,12 @@ export const actions = {
 
         locals.info = info.data;
 
-        const user  = await db.user.findUnique({
+        const user = await db.user.findUnique({
             where: {
                 login: info.data.login
             }
         });
-        
+
         if (user === null) {
             await db.user.create({
                 data: {

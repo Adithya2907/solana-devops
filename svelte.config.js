@@ -16,6 +16,9 @@ const config = {
 		env: {
 			dir: 'env'
 		},
+		csrf: {
+			checkOrigin: false
+		}
 	}
 };
 

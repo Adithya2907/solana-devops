@@ -1,45 +1,42 @@
 <script lang="ts">
-	import './styles.css';
 	import type { PageData } from './$types';
-
-	import { Octokit } from 'octokit';
 
 	import { onMount } from 'svelte';
 
 	import { enhance } from '$app/forms';
 
-	import { user } from '$lib/stores/user.store';
+	import { PUBLIC_GITHUB_ACCESS_URL } from '$env/static/public';
+	import { invalidate } from '$app/navigation';
 
 	export let data: PageData;
 
 	let tokenform: HTMLFormElement;
-
-	let installations = [];
-	let repos = [];
 
 	onMount(async () => {
 		if (data.userCookie.authenticating) {
 			tokenform.submit();
 		}
 
-		if (data.userCookie.authenticated && $user === null) {
-			const octokit = new Octokit({
-				auth: 'Bearer ' + data.userCookie.token
-			});
+		invalidate('/');
 
-			user.initialize(data.userCookie.token!, data.info!, octokit);
-		}
+		// if (data.userCookie.authenticated && $user === null) {
+		// 	const octokit = new Octokit({
+		// 		auth: 'Bearer ' + data.userCookie.token
+		// 	});
 
-		let response = await $user?.octokit.rest.apps.listInstallationsForAuthenticatedUser();
-		installations =
-			response?.data.installations.filter(
-				(installation) => installation.account?.id === $user?.id
-			) ?? [];
+		// 	user.initialize(data.userCookie.token!, data.info!, octokit);
+		// }
 
-		let x = await $user?.octokit.rest.apps.listInstallationReposForAuthenticatedUser({
-			installation_id: installations[0].id
-		});
-		repos = x?.data.repositories ?? [];
+		// let response = await $user?.octokit.rest.apps.listInstallationsForAuthenticatedUser();
+		// installations =
+		// 	response?.data.installations.filter(
+		// 		(installation) => installation.account?.id === $user?.id
+		// 	) ?? [];
+
+		// let x = await $user?.octokit.rest.apps.listInstallationReposForAuthenticatedUser({
+		// 	installation_id: installations[0].id
+		// });
+		// repos = x?.data.repositories ?? [];
 	});
 </script>
 
@@ -68,7 +65,5 @@
 	{/if}
 
 	<p>Can't find your repo?</p>
-	<a href="https://www.github.com/apps/sidharth-anand-ghat/installations/new">
-		Configure access here
-	</a>
+	<a href={PUBLIC_GITHUB_ACCESS_URL}> Configure access here </a>
 {/if}

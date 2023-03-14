@@ -48,6 +48,7 @@
 		"@prisma/client": "4.11.0",
 		"aria-hidden": "^1.2.3",
 		"axios": "^1.3.4",
+		"dotenv": "^16.0.3",
 		"svelte-floating-ui": "^1.2.8",
 		"teil-ui": "^0.0.1"
 	}
