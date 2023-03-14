@@ -88,21 +88,39 @@ export const POST = (async ({ request }) => {
 				started_at: new Date().toISOString()
 			});
 
-			const result = await build(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
+			try {
+				const result = await build(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
 
-			app?.rest.checks.update({
-				owner: repo.owner.login,
-				repo: repo.name,
-				check_run_id: check,
-				status: 'completed',
-				conclusion: result.status ? 'success' : 'failure',
-				completed_at: new Date().toISOString(),
-				output: {
-					title: 'SolStromm Build',
-					summary: result.status ? 'Build completed successfully!' : 'Build failed! View check logs for details',
-					text: result.log
+				app?.rest.checks.update({
+					owner: repo.owner.login,
+					repo: repo.name,
+					check_run_id: check?.data.id,
+					status: 'completed',
+					conclusion: result.status ? 'success' : 'failure',
+					completed_at: new Date().toISOString(),
+					output: {
+						title: 'SolStromm Build',
+						summary: result.status ? 'Build completed successfully!' : 'Build failed! View check logs for details',
+						text: result.log
+					}
+				});
+
+				if (result.status && listener.autodeploy) {
+					const result = await deploy(repo.owner.login, repo.name, body.after, installation.id, repoBuild);
+					console.log(listener.deployfe);
+					console.log(listener);
+
+					if (listener.deployfe && result.status) {
+						console.log('deploying fe');
+						const feresult = await fe(repo.owner.login, repo.name, body.after, installation.id, repoBuild, result.deploy);
+						console.log(feresult);
+					}
 				}
-			});
+			} catch (e) {
+				console.log(e);
+			}
+
+			clean();
 		}
 	} else if (event === 'pull_request' && (action === 'opened' || action === 'synchronize')) {
 		const user = await getUser(repo.owner.login);
