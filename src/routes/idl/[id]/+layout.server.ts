@@ -26,7 +26,11 @@ export const load = (async ({ params }) => {
         },
         include: {
             build: true,
-            deploy: true
+            deploy: {
+                include: {
+                    listener: true
+                }
+            }
         }
     });
 

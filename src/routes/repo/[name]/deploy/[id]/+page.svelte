@@ -38,7 +38,7 @@
 	<p>Programs</p>
 	{#each data.deploy.idls as idl}
 		<p>
-			{idl.program} - <a href="/idl/{idl.id}">View Documentation</a>
+			{idl.program} - <a href="/idl/{idl.id}/test">Test your program here!</a>
 		</p>
 	{/each}
 {/if}

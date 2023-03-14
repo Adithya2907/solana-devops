@@ -24,7 +24,7 @@
 	export let data: PageData;
 	import type { IDL } from '../IDL';
 
-	const network = clusterApiUrl('devnet');
+	const network = clusterApiUrl(data.cluster);
 
 	let idl = data.json;
 

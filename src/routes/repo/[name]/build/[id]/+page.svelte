@@ -68,7 +68,7 @@
 					Programs</a>
 				{#each data.build.idls as idl}
 					<p>
-						{idl.program} - <a href="/idl/{idl.id}">View Documentation</a>
+						{idl.program} - <a href="/idl/{idl.id}/docs">View Documentation</a>
 					</p>
 				{/each}
 			{/if}
