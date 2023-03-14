@@ -9,6 +9,7 @@
 	import { enhance } from '$app/forms';
 
 	import { user } from '$lib/stores/user.store';
+	import Header from './components/header.svelte';
 
 	export let data: PageData;
 
@@ -53,22 +54,36 @@
 		</form>
 	{/if}
 {:else}
-	<p>Logged in as <b>{data.info?.login}</b></p>
-	<form method="POST" action="?/logout">
-		<button type="submit">Logout</button>
-	</form>
-
-	<p>Installed Repos</p>
-	{#if data.user?.repos}
-		<ul>
-			{#each data.user?.repos as repo}
+	<Header {data} />
+	<div class="content">
+		<div class="grid grid--1-col">
+			<h2>Installed Repos</h2>
+			<div class="line thick"></div>
+			{#if data.user?.repos}
+			<ul>
+				{#each data.user?.repos as repo}
 				<li><a href="/repo/{repo.name}">{repo.name}</a></li>
-			{/each}
-		</ul>
-	{/if}
-
-	<p>Can't find your repo?</p>
-	<a href="https://www.github.com/apps/sidharth-anand-ghat/installations/new">
-		Configure access here
-	</a>
+				{/each}
+			</ul>
+			{/if}
+		</div>
+			<span>Can't find your repo?</span>
+			<a href="https://www.github.com/apps/sidharth-anand-ghat/installations/new">
+				Configure access here
+			</a>
+	</div>
 {/if}
+
+<style>
+	
+	h2 {
+		padding-left: 20px;
+		font-size: 1.5rem;
+	}
+
+	li {
+		margin-bottom: 20px;
+	}
+	
+	
+</style>

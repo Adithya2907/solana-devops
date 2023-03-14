@@ -64,7 +64,7 @@ export const actions = {
                 deploytarget: DeployTarget[deploytarget],
                 repoID: parseInt(repoID),
                 deployfe,
-                pluginID: plugin?.id
+                fepluginID: plugin?.id
             }
         });
     }
