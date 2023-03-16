@@ -2,6 +2,8 @@
 
 ## DevOps, for Solana!
 
+![Logo](https://github.com/Adithya2907/solana-devops/blob/main/screenshots/logo.jpeg)
+
 ## Introduction
 [SolStromm](https://solstromm.tech) is the missing piece of the whole Solana ecosystem. It provides an intuitive, developer-first, easy to configure platform for projects to stay on top of their deployments. We provide a high-level as well as fine-grain insight into your deployments, letting you be aware of your various deployments, and get easy access to your deployments.
 
