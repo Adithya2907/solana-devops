@@ -3,7 +3,7 @@
 ## DevOps, for Solana!
 
 ## Introduction
-SolStromm is the missing piece of the whole Solana ecosystem. It provides an intuitive, developer-first, easy to configure platform for projects to stay on top of their deployments. We provide a high-level as well as fine-grain insight into your deployments, letting you be aware of your various deployments, and get easy access to your deployments.
+[SolStromm](https://solstromm.tech) is the missing piece of the whole Solana ecosystem. It provides an intuitive, developer-first, easy to configure platform for projects to stay on top of their deployments. We provide a high-level as well as fine-grain insight into your deployments, letting you be aware of your various deployments, and get easy access to your deployments.
 
 ## Features
 - Setup custom listeners to trigger deploys on any events: push, PR raises, commits, etc.
@@ -12,6 +12,22 @@ SolStromm is the missing piece of the whole Solana ecosystem. It provides an int
 - Integrate with Netlify to auto-deploy your frontend to stay in-sync with your Solana program
 - An auto generated documentation page to help client-side developers build faster
 - A native web-based client for testing out your instructions specific to your Solana project
+
+## Walkthroughts
+
+[Part 1 | Introduction and Setup](https://youtu.be/R9uEgZas4FM)
+<br />
+[Part 2 | Post build steps](https://youtu.be/tHmn4IjH_m0)
+
+## The Team
+- [Sidharth Anand](https://github.com/sidharth-anand): Founder and CTO
+- [Adithya](https://github.com/Adithya2907): Founder and CEO
+
+## Website and Social Media
+
+[Website](https://solstromm.tech/)
+<br />
+[Twitter](https://twitter.com/SolStromm)
 
 ## Screenshots
 
@@ -35,21 +51,6 @@ SolStromm is the missing piece of the whole Solana ecosystem. It provides an int
 ### Native Instruction testing client
 ![Client](https://github.com/Adithya2907/solana-devops/blob/main/screenshots/client.png)
 ![Client Signing Transaction](https://github.com/Adithya2907/solana-devops/blob/main/screenshots/signing.png)
-
-## Walkthroughts
-
-[Part 1](https://youtu.be/R9uEgZas4FM)
-<br />
-[Part 2](https://youtu.be/tHmn4IjH_m0)
-
-## The Team
-- [Sidharth Anand](https://github.com/sidharth-anand): Founder and CTO
-- [Adithya](https://github.com/Adithya2907): Founder and CEO
-
-## Website and Social Media
-
-[Website](https://solstromm.tech/)
-[Twitter](https://twitter.com/SolStromm)
 
 ## Presentation Deck
 View our presentation deck over here to get an idea about our product, and our vision!
