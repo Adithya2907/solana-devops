@@ -9,7 +9,7 @@ export const UserCookieOptions: CookieSerializeOptions = {
     httpOnly: true,
     sameSite: 'none',
     maxAge: 60 * 60 * 24 * 30,
-    secure: true
+    secure: false
 };
 
 export const UserCookieActions = {

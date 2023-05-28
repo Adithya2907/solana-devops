@@ -7,7 +7,7 @@
 		"dev:vite": "vite dev --open --host",
 		"dev:smee": "smee --url https://smee.io/HIwFFAFTblPSTyS --path /api/hooks --port 5173",
 		"build": "vite build",
-		"preview": "vite preview",
+		"preview": "dotenv-flow -p env -- vite preview --host",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:unit": "vitest",
