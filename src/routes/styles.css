@@ -1,11 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&display=swap');
 
+* {
+	box-sizing: border-box;
+}
+
 :root {
 	--font-body: 'Rubik', sans-serif;
 	--font-mono: 'Fira Mono', monospace;
-	--color-bg-0: #161b19;
-	--color-bg-1: hsl(209, 36%, 86%);
+	--color-bg-0: #1C1C28;
+	--color-bg-1: #555770;
 	--color-bg-2: hsl(224, 44%, 95%);
 	--color-theme-1: #c5f1ff;
 	--color-theme-2: #4075a6;
@@ -20,7 +24,11 @@
 	--solana-accent: #1DD79B;
 	--solana-grey: #5b5f5d;
 
-	--line-color: #282d2b;
+	--white: #f5f5f5;
+	--gray-1: #f5f5f5bb;
+	--gray-2: #f5f5f577;
+
+	--line-color: #4D4F68;
 }
 
 body {

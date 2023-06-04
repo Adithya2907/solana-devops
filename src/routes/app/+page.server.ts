@@ -21,7 +21,7 @@ export const actions = {
         let state = '';
 
         if (user !== undefined && user.authenticated)
-            throw error(400, 'Already logged in');
+            throw redirect(302, '/app');
 
         [user, state] = UserCookieActions.state(UserCookieDefaultState);
 

@@ -36,5 +36,5 @@ export const GET = (async ({ url, cookies }) => {
 
     setCookie(cookies, UserCookie, user, UserCookieOptions);
 
-    throw redirect(302, '/');
+    throw redirect(302, '/app');
 }) satisfies RequestHandler;
