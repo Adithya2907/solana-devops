@@ -1,10 +1,9 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import type { PageData } from '../../../repo/[name]/$types';
 
 	import type { Build, Deploy } from '@prisma/client';
 
 	import { enhance } from '$app/forms';
-	import Header from '../../components/header.svelte';
 
 	export let data: PageData;
 
@@ -20,7 +19,6 @@
 	let deployfe = true;
 </script>
 
-<Header />
 <div class="content">
 	<h1>{data.repo?.name}</h1>
 

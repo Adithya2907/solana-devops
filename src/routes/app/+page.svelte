@@ -36,7 +36,7 @@
 			{#if data.user?.repos}
 				<ul>
 					{#each data.user?.repos as repo}
-						<li><a href="/repo/{repo.name}">{repo.name}</a></li>
+						<li><a href="/app/repo/{repo.name}">{repo.name}</a></li>
 					{/each}
 				</ul>
 			{/if}

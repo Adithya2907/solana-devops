@@ -18,7 +18,7 @@ export const GET = (async ({ url, cookies }) => {
         throw fail(400, { code: "Code is a required query parameter" });
 
     if (action !== null && installation !== null)
-        throw redirect(302, '/');
+        throw redirect(302, '/app');
 
     if (state === null)
         throw fail(400, { state: "State is a required query parameter" });
