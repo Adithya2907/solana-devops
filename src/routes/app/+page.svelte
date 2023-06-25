@@ -5,10 +5,15 @@
 
 	import { enhance } from '$app/forms';
 
-	import { PUBLIC_GITHUB_ACCESS_URL } from '$env/static/public';
 	import { invalidate } from '$app/navigation';
-	
-	import Header from '$lib/components/header.svelte';
+
+	import ChevronDown from '~icons/carbon/chevron-down';
+
+	import Frame from '$lib/components/frame.svelte';
+	import Button from '$lib/components/button.svelte';
+	import Search from '$lib/components/search.svelte';
+	import Repo from '$lib/components/repo.svelte';
+	import Deploy from '$lib/components/deploy.svelte';
 
 	export let data: PageData;
 
@@ -27,32 +32,54 @@
 	{#if data.userCookie.authenticating}
 		<p>Authenticating...</p>
 		<form bind:this={tokenform} method="POST" action="?/token" use:enhance />
-    {/if}
+	{/if}
 {:else}
 	<div class="content">
-		<div class="grid grid--1-col">
-			<h2>Installed Repos</h2>
-			<div class="line thick" />
-			{#if data.user?.repos}
-				<ul>
-					{#each data.user?.repos as repo}
-						<li><a href="/app/repo/{repo.name}">{repo.name}</a></li>
-					{/each}
-				</ul>
-			{/if}
-		</div>
-		<span>Can't find your repo?</span>
-		<a href={PUBLIC_GITHUB_ACCESS_URL}> Configure access here </a>
+		<Frame id="projects" heading="Projects">
+			<Button slot="cta">
+				Add New...
+				<ChevronDown slot="icon-right" />
+			</Button>
+			<Search slot="search" />
+			{#each data.repos as repo}
+				<Repo {repo} />
+			{/each}
+		</Frame>
+		<Frame id="deploys" heading="Deploys">
+			{#each data.deploys as deploy}
+				<Deploy {deploy} />
+			{/each}
+		</Frame>
+		<Frame id="builds" heading="Builds">
+			{#each data.builds as build}
+				<Deploy deploy={build} />
+			{/each}
+		</Frame>
 	</div>
 {/if}
 
 <style>
-	h2 {
-		padding-left: 20px;
-		font-size: 1.5rem;
+	.content {
+		width: 100%;
+		padding: 25px 120px;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-rows: repeat(2, minmax(0, 1fr));
+		gap: 15px;
 	}
 
-	li {
-		margin-bottom: 20px;
+	:global(.content > #projects) {
+		grid-column: 1 / 3;
+		grid-row: 1 / 2;
+	}
+
+	:global(.content > #deploys) {
+		grid-column: 1 / 2;
+		grid-row: 2 / 3;
+	}
+
+	:global(.content > #builds) {
+		grid-column: 2 / 3;
+		grid-row: 2 / 3;
 	}
 </style>

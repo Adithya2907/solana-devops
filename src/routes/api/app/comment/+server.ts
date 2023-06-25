@@ -24,7 +24,5 @@ export const POST = (async ({ request }) => {
         body: content,
     });
 
-    console.log(result?.status);
-
     return text("asd");
 }) satisfies RequestHandler;

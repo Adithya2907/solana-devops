@@ -11,7 +11,7 @@
 	--color-bg-0: #1C1C28;
 	--color-bg-1: #555770;
 	--color-bg-2: hsl(224, 44%, 95%);
-	--color-theme-1: #c5f1ff;
+	--color-theme-1: #008DFF;
 	--color-theme-2: #4075a6;
 	--color-text: #f7f7f7;
 	--column-width: 42rem;
@@ -27,6 +27,9 @@
 	--white: #f5f5f5;
 	--gray-1: #f5f5f5bb;
 	--gray-2: #f5f5f577;
+	--green: #06C270;
+	--red: #FF3B3B;
+	--blue: #008DFF;
 
 	--line-color: #4D4F68;
 }
@@ -61,7 +64,7 @@ p {
 }
 
 a {
-	color: var(--color-theme-1);
+	color: var(--blue);
 	text-decoration: none;
 }
 
@@ -126,10 +129,6 @@ button:focus:not(:focus-visible) {
 	white-space: nowrap;
 }
 
-.content {
-	max-width: 60%;
-	margin: 0 auto;
-}
 .text-center {
 	text-align: center;
 }

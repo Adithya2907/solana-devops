@@ -13,8 +13,6 @@ const GHAppStateDefault: GHAppState = {
 };
 
 export function getAppStore(): GHAppStore {
-    console.log(GITHUB_PRIVATE_KEY);
-
     const { subscribe, update } = writable(GHAppStateDefault);
 
     function initialize() {

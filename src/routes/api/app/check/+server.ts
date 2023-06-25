@@ -38,9 +38,6 @@ export const POST = (async ({ request }) => {
     });
 
     const checkID = result?.data.id;
-    console.log(checkID);
-
-    console.log(result?.status);
 
     setTimeout(async () => {
         await (await get(app).octokit?.getInstallationOctokit(installation))?.rest.checks.update({
