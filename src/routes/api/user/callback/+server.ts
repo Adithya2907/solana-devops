@@ -1,6 +1,6 @@
 import type { RequestHandler } from "./$types";
 
-import type { UserState } from "$lib//types/user.cookie";
+import type { UserState } from "$lib/types/user.cookie";
 
 import { fail, redirect } from '@sveltejs/kit';
 

@@ -1,35 +1,103 @@
 import type { LayoutServerLoad } from './$types';
 
-import { RepoStatus, type RepoInfo, type RepoDeploy, type RepoBuild } from '$lib/types/data';
+import { BuildStatus, BuildConclusion, type Deploy, type Build, type Listener, type Project } from '@prisma/client';
+
+import { ProjectStatus, type ProjectInfo, type ProjectDeploy, type ProjectBuild } from '$lib/types/data';
 
 import { get } from 'svelte/store';
 
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-TimeAgo.addDefaultLocale(en);
 
 import app from '$lib/stores/app.server';
 
 import db from '$lib/db/client';
 
+type ReplaceReturnType<T extends (...a: any) => any, TNewReturn> = (...a: Parameters<T>) => TNewReturn;
+
+TimeAgo.addDefaultLocale(en);
+const timeAgo = new TimeAgo('en-US');
+
+const getTime = (date: Date | null): string => {
+    return timeAgo.format(new Date(date ?? '').getTime())
+}
+
+const mapStatus = (status: BuildStatus, conclusion: BuildConclusion): ProjectStatus => {
+    return status === BuildStatus.COMPLETED ? conclusion === BuildConclusion.SUCCESS ? ProjectStatus.SUCCESS : ProjectStatus.FAILURE : status === BuildStatus.IN_PROGRESS ? ProjectStatus.PROGRESS : ProjectStatus.NEUTRAL;
+}
+
+const mapDeploy = (deploy: (Deploy & {
+    listener: Listener | null;
+    build: Build | null;
+}) | null | (Deploy & {
+    listener: (Listener & {
+        project: Project;
+    }) | null;
+    build: Build | null;
+})): ProjectDeploy | null => {
+    if (deploy === null) return null;
+
+    let mapped: ProjectDeploy = {
+        id: deploy.id,
+        branch: deploy?.listener?.branch ?? '',
+        commit: deploy?.build?.commit ?? '',
+        time: getTime(deploy.deployed),
+        status: mapStatus(deploy?.status ?? BuildStatus.COMPLETED, deploy?.conclusion ?? BuildConclusion.FAILURE)
+    };
+
+    if ('project' in (deploy?.listener ?? {})) {
+        mapped = {
+            project: (deploy.listener as (Listener & { project: Project })).project.name,
+            ...mapped
+        };
+    }
+
+    return mapped;
+}
+
+const mapBuild = (build: (Build & {
+    listener: Listener | null;
+}) | (Build & {
+    listener: (Listener & {
+        project: Project;
+    }) | null;
+}) | null): ProjectBuild | null => {
+    if (build === null) return null;
+
+    let mapped: ProjectBuild = {
+        id: build.id,
+        branch: build?.listener?.branch ?? '',
+        commit: build?.commit ?? '',
+        time: getTime(build.started),
+        issue: build?.issue ?? 0,
+        status: mapStatus(build?.status ?? BuildStatus.COMPLETED, build?.conclusion ?? BuildConclusion.FAILURE)
+    };
+
+    if ('project' in (build?.listener ?? {})) {
+        mapped = {
+            project: (build.listener as (Listener & { project: Project })).project.name,
+            ...mapped
+        };
+    }
+
+    return mapped;
+}
+
 export const load = (async ({ parent }) => {
     const { user } = await parent();
 
-    const timeAgo = new TimeAgo('en-US');
+    const projects: Array<ProjectInfo> = [];
 
-    const repos: Array<RepoInfo> = [];
-
-    for (const repo of user?.repos ?? []) {
-        console.log(repo);
-
-        const installation = await get(app).octokit?.getInstallationOctokit(repo.installationID);
+    for (const project of user?.projects ?? []) {
+        const installation = await get(app).octokit?.getInstallationOctokit(project.repo.installationID);
         const result = await installation?.rest.repos.get({
-            repo: repo.name,
+            repo: project.repo.name,
             owner: user?.login ?? ''
         });
 
+
         const commit = await installation?.rest.repos.getCommit({
-            repo: repo.name,
+            repo: project.repo.name,
             owner: user?.login ?? '',
             ref: result?.data.default_branch ?? ''
         });
@@ -37,7 +105,7 @@ export const load = (async ({ parent }) => {
         const build = await db.build.findFirst({
             where: {
                 listener: {
-                    repoID: repo.id
+                    projectID: project.id
                 }
             },
             orderBy: {
@@ -53,7 +121,7 @@ export const load = (async ({ parent }) => {
                 status: 'COMPLETED',
                 conclusion: 'SUCCESS',
                 listener: {
-                    repoID: repo.id
+                    projectID: project.id
                 }
             },
             orderBy: {
@@ -65,76 +133,50 @@ export const load = (async ({ parent }) => {
             }
         });
 
-        repos.push({
-            name: repo.name,
+        projects.push({
+            name: project.name,
             owner: user?.login ?? '',
             commit: {
                 message: commit?.data.commit.message ?? '',
                 time: timeAgo.format(new Date(commit?.data.commit.committer?.date ?? '').getTime()),
                 branch: result?.data.default_branch ?? ''
             },
-            deploy: deploy === null ? null : {
-                branch: deploy?.listener?.branch ?? '',
-                commit: deploy?.build?.commit ?? '',
-                time: timeAgo.format(new Date(deploy?.deployed ?? '').getTime()),
-                status: deploy?.status !== 'COMPLETED' ? RepoStatus.NEUTRAL : deploy?.conclusion !== 'SUCCESS' ? RepoStatus.FAILURE : RepoStatus.SUCCESS,
-            },
-            build: {
-                branch: build?.listener?.branch ?? '',
-                commit: build?.commit ?? '',
-                time: timeAgo.format(new Date(build?.started ?? '').getTime()),
-                status: build?.status !== 'COMPLETED' ? RepoStatus.NEUTRAL : build?.conclusion !== 'SUCCESS' ? RepoStatus.FAILURE : RepoStatus.SUCCESS,
-                issue: build?.issue ?? 0
-            }
+            deploy: mapDeploy(deploy),
+            build: mapBuild(build)
         });
     }
 
-    const deploys: Array<RepoDeploy> = (await db.deploy.findMany({
+    const deploys: Array<ProjectDeploy> = (await db.deploy.findMany({
         orderBy: {
             deployed: 'desc'
         },
         include: {
             listener: {
                 include: {
-                    repo: true
+                    project: true
                 }
             },
             build: true
         },
         take: 5
-    })).map(deploy => ({
-        id: deploy.id,
-        project: deploy.listener?.repo?.name.replace('-', ' ') ?? '',
-        branch: deploy?.listener?.branch ?? '',
-        commit: deploy?.build?.commit ?? '',
-        time: timeAgo.format(new Date(deploy?.deployed ?? '').getTime()),
-        status: deploy?.status !== 'COMPLETED' ? RepoStatus.NEUTRAL : deploy?.conclusion !== 'SUCCESS' ? RepoStatus.FAILURE : RepoStatus.SUCCESS,
-    }));
+    })).map(mapDeploy as ReplaceReturnType<typeof mapDeploy, ProjectDeploy>);
 
-    const builds: Array<RepoBuild> = (await db.build.findMany({
+    const builds: Array<ProjectBuild> = (await db.build.findMany({
         orderBy: {
             started: 'desc'
         },
         include: {
             listener: {
                 include: {
-                    repo: true
+                    project: true
                 }
             }
         },
         take: 5
-    })).map(build => ({
-        id: build.id,
-        project: build.listener?.repo?.name.replace('-', ' ') ?? '',
-        branch: build?.listener?.branch ?? '',
-        issue: build.issue ?? 0,
-        commit: build?.commit ?? '',
-        time: timeAgo.format(new Date(build?.ended ?? '').getTime()),
-        status: build?.status !== 'COMPLETED' ? RepoStatus.NEUTRAL : build?.conclusion !== 'SUCCESS' ? RepoStatus.FAILURE : RepoStatus.SUCCESS,
-    }))
+    })).map(mapBuild as ReplaceReturnType<typeof mapBuild, ProjectBuild>);
 
     return {
-        repos,
+        projects,
         deploys,
         builds
     };

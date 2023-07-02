@@ -13,12 +13,13 @@ import { getCookie, setCookie } from '$lib/cookie';
 import { Octokit } from 'octokit';
 
 import db from '$lib/db/client';
-import { invalidate } from '$app/navigation';
 
 export const actions = {
     login: async ({ cookies }) => {
         let user = getCookie<UserState>(cookies, UserCookie);
         let state = '';
+
+        console.log(user);
 
         if (user !== undefined && user.authenticated)
             throw redirect(302, '/app');
@@ -84,4 +85,35 @@ export const actions = {
 
         throw redirect(302, '/');
     },
+    project: async ({ request }) => {
+        const data = await request.formData();
+
+        if (!data.has('id'))
+            throw error(400, 'Missing repo id');
+
+        const id = Number.parseInt(data.get('id') as unknown as string);
+        const repo = await db.repo.findUnique({
+            where: {
+                id: id
+            }
+        });
+
+        if (repo === null)
+            throw error(400, 'Invalid repo id');
+
+        const result = await db.project.create({
+            data: {
+                name: repo.name.replace('-', ' '),
+                ownerID: repo.ownerID,
+                repoID: repo.id,
+            }
+        });
+
+        if (result === null)
+            throw error(500, 'Failed to create project');
+
+        return {
+            added: id
+        }
+    }
 } satisfies Actions;

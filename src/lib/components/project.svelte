@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { RepoInfo } from '$lib/types/data';
+	import type { ProjectInfo } from '$lib/types/data';
 
 	import GithubIcon from '~icons/ri/github-fill';
 	import BranchIcon from '~icons/ri/git-branch-fill';
@@ -8,60 +8,60 @@
 	import ExternalLinkIcon from '~icons/ri/external-link-line';
 	import DotsIcon from '~icons/mdi/dots-vertical';
 
-	export let repo: RepoInfo;
+	export let project: ProjectInfo;
 </script>
 
 <div class="repo">
 	<GithubIcon />
 	<div class="info">
 		<div class="multiline">
-			<h3>{repo.name.split('-').join(' ')}</h3>
-			<p>{repo.owner}/{repo.name}</p>
+			<h3>{project.name}</h3>
+			<p>{project.owner}/{project.name}</p>
 		</div>
 		<div class="multiline">
-			<p>{repo.commit.message}</p>
+			<p>{project.commit.message}</p>
 			<div>
-				<span>{repo.commit.time} on</span>
+				<span>{project.commit.time} on</span>
 				<BranchIcon />
-				<span>{repo.commit.branch}</span>
+				<span>{project.commit.branch}</span>
 			</div>
 		</div>
 		<div class="multiline">
-			{#if repo.deploy === null}
+			{#if project.deploy === null}
 				<p>This project has not been deployed yet</p>
 			{:else}
 				<div>
 					<span>Deployed&nbsp;</span>
-					<span class="status-{repo.deploy.status}">{repo.deploy.commit}</span>
+					<span class="status-{project.deploy.status}">{project.deploy.commit}</span>
 					<span>&nbsp;on</span>
 					<BranchIcon />
-					<span>{repo.deploy.branch}</span>
+					<span>{project.deploy.branch}</span>
 				</div>
 				<div>
-					<span>{repo.deploy.time}</span>
+					<span>{project.deploy.time}</span>
 				</div>
 			{/if}
 		</div>
 		<div class="multiline">
-			{#if repo.build === null}
+			{#if project.build === null}
 				<p>The project has not been built yet</p>
 			{:else}
 				<div>
 					<span>Build&nbsp;</span>
-					<span class="status-{repo.build.status}">
-						{#if repo.build.status === 'neutral'}
+					<span class="status-{project.build.status}">
+						{#if project.build.status === 'neutral'}
 							in progress
 						{:else}
-							{repo.build.status}
+							{project.build.status}
 						{/if}
 					</span>
 					<span>&nbsp;on</span>
 					<BranchIcon />
-					<span>{repo.build.branch}&nbsp;</span>
-					<span>(<a href="https://github.com/{repo.owner}/{repo.name}/issues/{repo.build.issue}">#{repo.build.issue}</a>)</span>
+					<span>{project.build.branch}&nbsp;</span>
+					<span>(<a href="https://github.com/{project.owner}/{project.name}/issues/{project.build.issue}">#{project.build.issue}</a>)</span>
 				</div>
 				<div>
-					<span>{repo.build.time}</span>
+					<span>{project.build.time}</span>
 				</div>
 			{/if}
 		</div>

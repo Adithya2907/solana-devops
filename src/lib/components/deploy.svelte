@@ -1,23 +1,25 @@
 <script lang="ts">
 	import type { ComponentProps } from 'svelte';
 
-	import type { RepoDeploy } from '$lib/types/data';
-	import { RepoStatus } from '$lib/types/data';
+	import type { ProjectDeploy } from '$lib/types/data';
+	import { ProjectStatus } from '$lib/types/data';
 
 	import Badge from './badge.svelte';
 
 	import BranchIcon from '~icons/ri/git-branch-fill';
-    import ChevronRight from '~icons/ri/arrow-right-s-line';
+	import ChevronRight from '~icons/ri/arrow-right-s-line';
 
-	export let deploy: RepoDeploy;
+	export let deploy: ProjectDeploy;
 
-	const StatusMap: Map<RepoStatus, Required<ComponentProps<InstanceType<typeof Badge>>>['state']> =
-		new Map([
-			[RepoStatus.SUCCESS, 'success'],
-			[RepoStatus.NEUTRAL, 'warning'],
-			[RepoStatus.FAILURE, 'error'],
-			[RepoStatus.PROGRESS, 'info']
-		]);
+	const StatusMap: Map<
+		ProjectStatus,
+		Required<ComponentProps<InstanceType<typeof Badge>>>['state']
+	> = new Map([
+		[ProjectStatus.SUCCESS, 'success'],
+		[ProjectStatus.NEUTRAL, 'warning'],
+		[ProjectStatus.FAILURE, 'error'],
+		[ProjectStatus.PROGRESS, 'info']
+	]);
 </script>
 
 <div class="deploy">
@@ -27,7 +29,7 @@
 			<span>&nbsp;#{deploy.id}</span>
 		</div>
 		<Badge state={StatusMap.get(deploy.status)}>
-			{#if deploy.status === RepoStatus.NEUTRAL}
+			{#if deploy.status === ProjectStatus.NEUTRAL}
 				Queued
 			{:else}
 				{deploy.status}
@@ -41,7 +43,7 @@
 		</div>
 		<span>{deploy.time}</span>
 	</div>
-    <ChevronRight></ChevronRight>
+	<ChevronRight />
 </div>
 
 <style>
@@ -59,18 +61,18 @@
 		padding: 13px 0;
 		gap: 40px;
 		align-items: center;
-        flex-grow: 1;
+		flex-grow: 1;
 	}
 
 	.deploy > div > div {
-        display: flex;
-        gap: 0;
-        align-items: center;
-    }
+		display: flex;
+		gap: 0;
+		align-items: center;
+	}
 
-    .deploy a {
-        font-size: 12px;
-    }
+	.deploy a {
+		font-size: 12px;
+	}
 
 	h3 {
 		text-transform: capitalize;
@@ -90,13 +92,13 @@
 		color: var(--gray-2);
 	}
 
-    :global(.deploy svg) {
-        width: 10px;
-        height: 10px;
-    }
+	:global(.deploy svg) {
+		width: 10px;
+		height: 10px;
+	}
 
-    :global(.deploy > svg) {
-        width: 15px;
-        height: 15px;
-    }
+	:global(.deploy > svg) {
+		width: 15px;
+		height: 15px;
+	}
 </style>

@@ -1,33 +1,33 @@
-export enum RepoStatus {
+export enum ProjectStatus {
     SUCCESS = "success",
     FAILURE = "failure",
     NEUTRAL = "neutral",
     PROGRESS = "progress",
 };
 
-export type RepoLastCommit = {
+export type ProjectLastCommit = {
     message: string;
     time: string;
     branch: string;
 };
 
-export type RepoDeploy = {
+export type ProjectDeploy = {
     id?: number;
     project?: string;
     commit: string;
     time: string;
     branch: string;
-    status: RepoStatus;
+    status: ProjectStatus;
 };
 
-export type RepoBuild = RepoDeploy & {
+export type ProjectBuild = ProjectDeploy & {
     issue: number;
 }
 
-export type RepoInfo = {
+export type ProjectInfo = {
     name: string;
     owner: string;
-    commit: RepoLastCommit;
-    build: RepoBuild | null;
-    deploy: RepoDeploy | null;
+    commit: ProjectLastCommit;
+    build: ProjectBuild | null;
+    deploy: ProjectDeploy | null;
 };

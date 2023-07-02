@@ -31,7 +31,12 @@ export const load = (async ({ cookies, locals }) => {
                 login: locals.info.login
             },
             include: {
-                repos: true
+                repos: true,
+                projects: {
+                    include: {
+                        repo: true
+                    }
+                }
             }
         });
     }

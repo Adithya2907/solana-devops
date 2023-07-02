@@ -12,6 +12,7 @@ model User {
   id Int @id @default(autoincrement())
   login String @unique
   repos Repo[]
+  projects Project[]
 }
 
 model Repo {
@@ -21,12 +22,28 @@ model Repo {
   url String
   state RepoState
   installationID Int
-  listeners Listener[]
 
   owner User? @relation(fields: [ownerID], references: [id])
   ownerID Int?
 
+  project Project?
+
   @@unique([ownerID, name])
+}
+
+model Project {
+  id Int @id @default(autoincrement())
+  name String
+  
+  repo Repo @relation(fields: [repoID], references: [id])
+  repoID Int
+
+  owner User? @relation(fields: [ownerID], references: [id])
+  ownerID Int?
+
+  listeners Listener[]
+
+  @@unique([repoID])
 }
 
 model Listener {
@@ -45,10 +62,10 @@ model Listener {
   builds Build[]
   deploys Deploy[]
 
-  repo Repo? @relation(fields: [repoID], references: [id])
-  repoID Int?
+  project Project @relation(fields: [projectID], references: [id])
+  projectID Int
 
-  @@unique([repoID, branch, type])
+  @@unique([projectID, branch, type])
 }
 
 model Build {
