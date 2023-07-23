@@ -7146,10 +7146,10 @@ tar-stream@^2.2.0:
     inherits "^2.0.3"
     readable-stream "^3.1.1"
 
-teil-ui@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/teil-ui/-/teil-ui-0.0.1.tgz#a83676587a8dc23edb2c00ecf69befa014161d1c"
-  integrity sha512-UcRuPZU5ajTK/GcRAUM+5BrShITqTUZPqpp0Fzqt8DXTVSwSbBvWxkrFGwhmjQ1mWFXRvdEfibwJL9luAxWAAA==
+teil-ui@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/teil-ui/-/teil-ui-0.0.7.tgz#5f9ffb8324ab897a528f353a93a374ee3c258aa2"
+  integrity sha512-YotGMMlVX3PUdCNQcZICKOpDVXd+NvNGkh1x+rwZO/4tegrYKsyPCl5q9QeKLowJ5ojWX0NiS5oW3jzwf3kW4Q==
 
 text-encoding-utf-8@^1.0.2:
   version "1.0.2"

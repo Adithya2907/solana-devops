@@ -63,6 +63,6 @@
 		"aria-hidden": "^1.2.3",
 		"dotenv": "^16.0.3",
 		"svelte-floating-ui": "^1.2.8",
-		"teil-ui": "^0.0.1"
+		"teil-ui": "^0.0.7"
 	}
 }

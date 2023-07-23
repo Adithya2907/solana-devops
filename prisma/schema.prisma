@@ -55,6 +55,8 @@ model Listener {
   autodeploy Boolean @default(true)
   deploytarget DeployTarget
 
+  production Boolean @default(false)
+
   deployfe Boolean @default(false)
   feplugin Plugin? @relation(fields: [fepluginID], references: [id])
   fepluginID Int?

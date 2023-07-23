@@ -29,7 +29,8 @@
 	.header {
 		background: transparent;
 		width: 100%;
-		padding: 10px 25px;
+		height: 75px;
+		padding: 25px 10px;
 		border-bottom: 1px solid var(--line-color);
         display: flex;
         justify-content: space-between;
@@ -42,5 +43,6 @@
 
 	.header h2 {
 		font-size: 1.5rem;
+		margin: 0;
 	}
 </style>

@@ -15,7 +15,7 @@
 	<GithubIcon />
 	<div class="info">
 		<div class="multiline">
-			<h3>{project.name}</h3>
+			<a href="/app/project/{project.id}"><h3>{project.name}</h3></a>
 			<p>{project.owner}/{project.name}</p>
 		</div>
 		<div class="multiline">
@@ -112,7 +112,11 @@
 		flex-grow: 1;
 	}
 
-	.multiline > h3 {
+	.multiline > a {
+		color: var(--white);
+	}
+
+	.multiline > a > h3 {
 		text-transform: capitalize;
 		color: var(--white);
 		margin: 0;

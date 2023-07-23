@@ -13,10 +13,11 @@ export const actions = {
         const errors: Record<string, string> = {};
 
         const branch = data.get("branch")?.toString();
-        const type = data.get("type")?.toString();
+        const type = data.get("trigger")?.toString();
         const autodeploy = data.get("autodeploy")?.toString() === "on" ? true : false;
-        const deploytarget = data.get("deploytarget")?.toString();
-        const repoID = data.get("repoID")?.toString();
+        const deploytarget = data.get("target")?.toString();
+        const project = data.get("project")?.toString();
+        const production = data.get("production")?.toString() === "on" ? true : false;
         const deployfe = data.get("deployfe")?.toString() === "on" ? true : false;
         const feplugin = data.get("feplugin")?.toString();
         const fetarget = data.get("fetarget")?.toString();
@@ -34,8 +35,8 @@ export const actions = {
             errors["autodeploy"] = "Autodeploy is required";
         if (deploytarget === null || deploytarget === undefined)
             errors["deploytarget"] = "Deploy target is required";
-        if (repoID === null || repoID === undefined)
-            errors["repoID"] = "Repo ID is required";
+        if (project === null || project === undefined)
+            errors["project"] = "Project is required";
 
         if (Object.keys(errors).length > 0)
             return fail(400, errors);
@@ -61,8 +62,9 @@ export const actions = {
                 branch,
                 type: ListenerType[type],
                 autodeploy,
+                production,
                 deploytarget: DeployTarget[deploytarget],
-                repoID: parseInt(repoID),
+                projectID: parseInt(project),
                 deployfe,
                 fepluginID: plugin?.id
             }

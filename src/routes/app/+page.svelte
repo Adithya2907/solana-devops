@@ -17,7 +17,7 @@
 	import Frame from '$lib/components/frame.svelte';
 	import Button from '$lib/components/button.svelte';
 	import Search from '$lib/components/search.svelte';
-	import Repo from '$lib//components/project.svelte';
+	import Project from '$lib//components/project.svelte';
 	import Deploy from '$lib/components/deploy.svelte';
 	
 	import { PUBLIC_GITHUB_ACCESS_URL } from '$env/static/public';
@@ -101,7 +101,7 @@
 			</Dialog.Container>
 			<Search slot="search" />
 			{#each data.projects as project}
-				<Repo {project} />
+				<Project {project} />
 			{/each}
 		</Frame>
 		<Frame id="deploys" heading="Deploys">
@@ -140,61 +140,6 @@
 	:global(.content > #builds) {
 		grid-column: 2 / 3;
 		grid-row: 2 / 3;
-	}
-
-	:global(.dialog__trigger) {
-		padding: 0;
-		margin: 0;
-		outline: none;
-		border: none;
-		background: transparent;
-		border-radius: 5px;
-	}
-
-	:global(.dialog__overlay) {
-		background-color: black;
-		opacity: 0.3;
-		position: fixed;
-		inset: 0;
-	}
-	:global(.dialog__content) {
-		background-color: var(--color-bg-1);
-		border-radius: 10px;
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 90vw;
-		max-width: 450px;
-		max-height: 85vh;
-		padding: 25px;
-		color: #4c566a;
-		z-index: 99;
-		color: var(--white);
-	}
-	:global(.dialog__title) {
-		color: var(--white);
-		font-size: 1.5rem;
-		margin: 0;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	:global(.dialog__exit) {
-		color: var(--gray-2);
-		width: 24px;
-		height: 24px;
-		cursor: pointer;
-	}
-	:global(.dialog__exit:hover) {
-		color: var(--white);
-	}
-	:global(.dialog__close) {
-		color: var(--green);
-		background: transparent;
-		border: none;
-		outline: none;
-		cursor: pointer;
 	}
 
 	:global(.repos .repo) {
