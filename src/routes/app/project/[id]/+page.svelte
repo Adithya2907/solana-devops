@@ -35,8 +35,6 @@
 
 	$: uniqueListener = data.listeners.filter(listener => listener.branch === branch && listener.type === trigger).length === 0;
 	$: validListener = validString(trigger) && validString(branch) && validString(target) && uniqueListener;
-
-	$: console.log(validListener, uniqueListener);
 </script>
 
 <div class="page">
@@ -313,61 +311,6 @@
 		grid-template-rows: repeat(2, minmax(0, 1fr));
 		gap: 20px;
 		padding: 20px 0;
-	}
-
-	.production {
-		display: flex;
-		flex-direction: column;
-		gap: 25px;
-		padding: 10px;
-	}
-
-	.production .multiline {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.production .multiline > h5 {
-		text-transform: uppercase;
-		color: var(--gray-2);
-		margin: 0;
-		font-weight: 400;
-		font-size: 14px;
-	}
-
-	.production .multiline > p {
-		color: var(--white);
-		margin: 0;
-		font-size: 12px;
-	}
-
-	.production .multicol {
-		display: flex;
-		gap: 40px;
-		align-items: center;
-	}
-
-	.production .iconline {
-		display: flex;
-		gap: 10px;
-		align-items: center;
-	}
-
-	.production .iconline span {
-		color: var(--white);
-		font-size: 12px;
-	}
-
-	.production .author {
-		text-decoration: underline;
-	}
-
-	:global(.production .iconline svg) {
-		width: 16px;
-		height: 16px;
-		color: var(--gray-2);
-		margin: 0;
 	}
 
 	form .formrow {

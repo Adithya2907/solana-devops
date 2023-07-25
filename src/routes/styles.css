@@ -465,3 +465,143 @@ ul a {
 	width: 16px;
 	height: 16px;
 }
+
+/*
+*	Production/Summary information
+*/
+.production {
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+	padding: 10px;
+}
+
+.production .multiline {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.production .multiline > h5 {
+	text-transform: uppercase;
+	color: var(--gray-2);
+	margin: 0;
+	font-weight: 400;
+	font-size: 14px;
+}
+
+.production .multiline > p {
+	color: var(--white);
+	margin: 0;
+	font-size: 12px;
+}
+
+.production .multicol {
+	display: flex;
+	gap: 40px;
+	align-items: center;
+}
+
+.production .iconline {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.production .iconline span {
+	color: var(--white);
+	font-size: 12px;
+}
+
+.production .author {
+	text-decoration: underline;
+}
+
+.production .iconline svg {
+	width: 16px;
+	height: 16px;
+	color: var(--gray-2);
+	margin: 0;
+}
+
+/*
+*	Details Accordion
+*/
+
+.details.accordion__container {
+	width: 100%;
+}
+
+.details .accordion__item {
+	overflow: hidden;
+}
+
+.accordion__item:focus-within {
+	position: relative;
+	z-index: 1;
+}
+  
+.details .accordion__trigger {
+	width: 100%;
+	display: flex;
+	padding: 0 15px;
+	outline: none;
+	border: none;
+	align-items: center;
+	justify-content: space-between;
+	background: transparent;
+	color: var(--white);
+	font-size: 15px;
+	cursor: pointer;
+}
+
+.details .accordion__trigger[aria-expanded="true"], .details .accordion__trigger:hover {
+	background: #28293d;
+}
+
+.details .accordion__trigger .title {
+	display: flex;
+	align-items: center;
+	padding: 20px 0;
+	gap: 10px;
+}
+
+.details .accordion__trigger .info {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: var(--blue);
+}
+
+.details .accordion__trigger .info span {
+	color: var(--gray-2);
+}
+
+.details .accordion__trigger .info.success {
+	color: var(--green);
+}
+
+.details .accordion__trigger svg {
+	width: 18px;
+	height: 18px;
+	transition: transform 0.4s ease-in;
+}
+
+.details .accordion__trigger[aria-expanded="true"] svg:nth-of-type(1) {
+	transform: rotateZ(90deg);
+}
+
+.details .accordion__content {
+	background: #32334C;
+	overflow: hidden;
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.details .accordion__content .text {
+	padding: 10px 20px;
+}
+
+.details .accordion__content .none {
+	color: var(--gray-2);
+	font-weight: 300;
+}

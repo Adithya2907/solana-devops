@@ -25,7 +25,7 @@
 <div class="deploy">
 	<div>
 		<div class="title">
-			<h3>{deploy.project}</h3>
+			<a href="/app/build/{deploy.id}"><h3>{deploy.project}</h3></a>
 			<span>&nbsp;#{deploy.id}</span>
 		</div>
 		<Badge state={StatusMap.get(deploy.status)}>
@@ -79,6 +79,7 @@
 		margin: 0;
 		font-size: 15px;
 		color: var(--white);
+		cursor: pointer;
 	}
 
 	.deploy .title span {

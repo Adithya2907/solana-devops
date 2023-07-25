@@ -1,18 +1,20 @@
 <script lang="ts">
-    export let heading: string = '';
+	export let heading: string = '';
 </script>
 
 <div class="frame" {...$$restProps}>
-	<div class="header">
-		<h2>{heading}</h2>
-		<div>
-            <slot name="search"></slot>
-            <slot name="cta"></slot>
-        </div>
-	</div>
+	{#if heading}
+		<div class="header">
+			<h2>{heading}</h2>
+			<div>
+				<slot name="search" />
+				<slot name="cta" />
+			</div>
+		</div>
+	{/if}
 	<div class="body">
-        <slot></slot>
-    </div>
+		<slot />
+	</div>
 </div>
 
 <style>
@@ -22,7 +24,7 @@
 		padding: 0 15px 10px 15px;
 		display: flex;
 		flex-direction: column;
-        border-radius: 20px;
+		border-radius: 20px;
 		box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 	}
 
@@ -32,14 +34,14 @@
 		height: 75px;
 		padding: 25px 10px;
 		border-bottom: 1px solid var(--line-color);
-        display: flex;
-        justify-content: space-between;
+		display: flex;
+		justify-content: space-between;
 	}
 
-    .header > div {
-        display: flex;
-        gap: 10px;
-    }
+	.header > div {
+		display: flex;
+		gap: 10px;
+	}
 
 	.header h2 {
 		font-size: 1.5rem;
