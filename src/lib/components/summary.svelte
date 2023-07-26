@@ -18,7 +18,7 @@
 </script>
 
 <Frame>
-    <div class="container">
+    <div class="summary container">
         <div class="main">
             <h2 class="title">{deploy.project}</h2>
             <h5 class="subtitle">{repo}</h5>
@@ -114,7 +114,7 @@
         color: var(--white);
     }
 
-    .actions {
+    .summary .actions {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -122,7 +122,7 @@
         gap: 10px;
     }
 
-    :global(.actions > button) {
+    :global(.summary .actions > button) {
         width: 100%;
         justify-content: center;
     }

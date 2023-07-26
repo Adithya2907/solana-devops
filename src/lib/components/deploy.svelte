@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ComponentProps } from 'svelte';
 
-	import type { ProjectDeploy } from '$lib/types/data';
+	import type { ProjectDeploy, ProjectBuild } from '$lib/types/data';
 	import { ProjectStatus } from '$lib/types/data';
 
 	import Badge from './badge.svelte';
@@ -9,7 +9,7 @@
 	import BranchIcon from '~icons/ri/git-branch-fill';
 	import ChevronRight from '~icons/ri/arrow-right-s-line';
 
-	export let deploy: ProjectDeploy;
+	export let deploy: ProjectDeploy | ProjectBuild;
 
 	const StatusMap: Map<
 		ProjectStatus,
@@ -20,12 +20,14 @@
 		[ProjectStatus.FAILURE, 'error'],
 		[ProjectStatus.PROGRESS, 'info']
 	]);
+
+	const isBuild = Object.hasOwn(deploy, 'issue');
 </script>
 
 <div class="deploy">
 	<div>
 		<div class="title">
-			<a href="/app/build/{deploy.id}"><h3>{deploy.project}</h3></a>
+			<a href="/app/{isBuild ? 'build' : 'deploy'}/{deploy.id}"><h3>{deploy.project}</h3></a>
 			<span>&nbsp;#{deploy.id}</span>
 		</div>
 		<Badge state={StatusMap.get(deploy.status)}>

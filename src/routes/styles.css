@@ -587,7 +587,7 @@ ul a {
 	transition: transform 0.4s ease-in;
 }
 
-.details .accordion__trigger[aria-expanded="true"] svg:nth-of-type(1) {
+.details .accordion__trigger[aria-expanded="true"] svg:nth-child(1) {
 	transform: rotateZ(90deg);
 }
 
