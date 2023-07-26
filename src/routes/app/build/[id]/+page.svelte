@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 
-
 	import { mapBuild, mapListener, mapDeploy } from '$lib/mappers';
 
 	import Summary from '$lib/components/summary.svelte';
