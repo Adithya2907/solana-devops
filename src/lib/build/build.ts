@@ -20,7 +20,7 @@ import db from '$lib/db/client';
 import { AWS_S3_ACCESS_KEY, AWS_S3_SECRET_KEY } from '$env/static/private';
 import { PUBLIC_REPO_PATH } from '$env/static/public';
 
-type BuildResult = {
+export type BuildResult = {
     status: boolean;
     log: string;
 };

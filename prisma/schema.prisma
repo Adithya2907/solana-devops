@@ -86,8 +86,8 @@ model Build {
   idls IDL[]
   deploys Deploy[]
 
-  listener Listener? @relation(fields: [listenerID], references: [id])
-  listenerID Int?
+  listener Listener @relation(fields: [listenerID], references: [id])
+  listenerID Int
 }
 
 model Deploy {
