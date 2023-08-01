@@ -22,7 +22,7 @@
         <div class="main">
             <h2 class="title">{deploy.project}</h2>
             <h5 class="subtitle">{repo}</h5>
-            <h5 class="subtitle">Build #<span class="issue">{deploy.id}</span></h5>
+            <h5 class="subtitle">Build #<span class="issue">{deploy.count}</span></h5>
         </div>
         <div class="info production">
             <div class="multiline">

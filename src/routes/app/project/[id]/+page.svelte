@@ -64,7 +64,7 @@
 						{data.idls && data.idls.length > 0 ? data.idls[0].programid : ''}
 						(<a
 							href="https://github.com/{data.project.repo.fullname}/{data.production.build?.issue}"
-							>#{data.production.id}</a
+							>#{data.production.count}</a
 						>)
 					</p>
 				</div>

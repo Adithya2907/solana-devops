@@ -18,6 +18,7 @@ export function mapBuild(build: (Build & {
 
     let mapped: ProjectBuild = {
         id: build.id,
+        count: build.count,
         branch: build?.listener?.branch ?? '',
         commit: build?.commit ?? '',
         time: mapTime(build.started),

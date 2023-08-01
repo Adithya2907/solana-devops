@@ -28,7 +28,7 @@
 	<div>
 		<div class="title">
 			<a href="/app/{isBuild ? 'build' : 'deploy'}/{deploy.id}"><h3>{deploy.project}</h3></a>
-			<span>&nbsp;#{deploy.id}</span>
+			<span>&nbsp;#{deploy.count}</span>
 		</div>
 		<Badge state={StatusMap.get(deploy.status)}>
 			{#if deploy.status === ProjectStatus.NEUTRAL}

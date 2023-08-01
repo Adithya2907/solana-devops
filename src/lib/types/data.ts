@@ -15,6 +15,7 @@ export type ProjectLastCommit = {
 
 export type ProjectDeploy = {
     id?: number;
+    count: number;
     project?: string;
     commit: string;
     message?: string;

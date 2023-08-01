@@ -20,6 +20,7 @@ export function mapDeploy(deploy: (Deploy & {
 
     let mapped: ProjectDeploy = {
         id: deploy.id,
+        count: deploy.count,
         branch: deploy?.listener?.branch ?? '',
         commit: deploy?.build?.commit ?? '',
         time: mapTime(deploy.deployed),
