@@ -1,6 +1,6 @@
 datasource db {
-  provider = "mysql"
-  url      = env("PRISMA_DB_URL")
+  provider     = "mysql"
+  url          = env("PRISMA_DB_URL")
   relationMode = "prisma"
 }
 
@@ -9,21 +9,21 @@ generator client {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  login String @unique
-  repos Repo[]
+  id       Int       @id @default(autoincrement())
+  login    String    @unique
+  repos    Repo[]
   projects Project[]
 }
 
 model Repo {
-  id Int @id @default(autoincrement())
-  name String
-  fullname String @unique
-  url String
-  state RepoState
+  id             Int       @id @default(autoincrement())
+  name           String
+  fullname       String    @unique
+  url            String
+  state          RepoState
   installationID Int
 
-  owner User? @relation(fields: [ownerID], references: [id])
+  owner   User? @relation(fields: [ownerID], references: [id])
   ownerID Int?
 
   project Project?
@@ -32,13 +32,13 @@ model Repo {
 }
 
 model Project {
-  id Int @id @default(autoincrement())
+  id   Int    @id @default(autoincrement())
   name String
-  
-  repo Repo @relation(fields: [repoID], references: [id])
+
+  repo   Repo @relation(fields: [repoID], references: [id])
   repoID Int
 
-  owner User? @relation(fields: [ownerID], references: [id])
+  owner   User? @relation(fields: [ownerID], references: [id])
   ownerID Int?
 
   listeners Listener[]
@@ -50,79 +50,81 @@ model Listener {
   id Int @id @default(autoincrement())
 
   branch String
-  type ListenerType
+  type   ListenerType
 
-  autodeploy Boolean @default(true)
+  autodeploy   Boolean      @default(true)
   deploytarget DeployTarget
 
   production Boolean @default(false)
 
-  deployfe Boolean @default(false)
-  feplugin Plugin? @relation(fields: [fepluginID], references: [id])
+  deployfe   Boolean @default(false)
+  feplugin   Plugin? @relation(fields: [fepluginID], references: [id])
   fepluginID Int?
 
-  builds Build[]
+  builds  Build[]
   deploys Deploy[]
 
-  project Project @relation(fields: [projectID], references: [id])
+  project   Project @relation(fields: [projectID], references: [id])
   projectID Int
 
   @@unique([projectID, branch, type])
 }
 
 model Build {
-  id Int @id @default(autoincrement())
+  id    Int @id @default(autoincrement())
+  count Int
 
   commit String
-  issue Int?
+  issue  Int?
 
-  log String? //Link to S3 URL of log output
-  status BuildStatus @default(QUEUED)
+  log        String? //Link to S3 URL of log output
+  status     BuildStatus      @default(QUEUED)
   conclusion BuildConclusion?
 
   started DateTime?
-  ended DateTime?
+  ended   DateTime?
 
-  idls IDL[]
+  idls    IDL[]
   deploys Deploy[]
 
-  listener Listener @relation(fields: [listenerID], references: [id])
+  listener   Listener @relation(fields: [listenerID], references: [id])
   listenerID Int
 }
 
 model Deploy {
-  id Int @id @default(autoincrement())
+  id    Int @id @default(autoincrement())
+  count Int
 
-  log String?
+  log      String?
   deployed DateTime?
 
   idls IDL[]
 
-  status BuildStatus @default(QUEUED)
+  status     BuildStatus      @default(QUEUED)
   conclusion BuildConclusion?
 
-  build Build? @relation(fields: [buildID], references: [id])
+  build   Build? @relation(fields: [buildID], references: [id])
   buildID Int?
 
-  listener Listener? @relation(fields: [listenerID], references: [id])
+  listener   Listener? @relation(fields: [listenerID], references: [id])
   listenerID Int
 
-  frontendDeploy FrontendDeploy? @relation(fields: [frontendDeployID], references: [id])
-  frontendDeployID Int? @unique
+  frontendDeploy   FrontendDeploy? @relation(fields: [frontendDeployID], references: [id])
+  frontendDeployID Int?            @unique
 }
 
 model IDL {
   id Int @id @default(autoincrement())
 
-  program String
-  key String @unique
+  program   String
+  key       String  @unique
   programid String?
 
-  build Build? @relation(fields: [buildId], references: [id])
-  buildId Int? 
+  build   Build? @relation(fields: [buildId], references: [id])
+  buildId Int?
 
-  deploy Deploy? @relation(fields: [deployId], references: [id])
-  deployId Int? @unique
+  deploy   Deploy? @relation(fields: [deployId], references: [id])
+  deployId Int?    @unique
 
   @@unique([buildId, program])
   @@unique([deployId, program])
@@ -131,13 +133,13 @@ model IDL {
 model Plugin {
   id Int @id @default(autoincrement())
 
-  name String
-  key String 
-  target String
-  dir String
-  idl String
+  name    String
+  key     String
+  target  String
+  dir     String
+  idl     String
   command String
-  output String
+  output  String
 
   listener Listener[]
 }
@@ -145,8 +147,8 @@ model Plugin {
 model FrontendDeploy {
   id Int @id @default(autoincrement())
 
-  log String?
-  url String?
+  log      String?
+  url      String?
   deployed DateTime?
 
   deploy Deploy?

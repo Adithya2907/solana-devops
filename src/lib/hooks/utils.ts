@@ -156,8 +156,25 @@ export async function getListener(info: InfoType, type: ListenerType): Promise<L
 }
 
 export async function createBuild(info: InfoType, listener: Listener, issue: number | null = null): Promise<Build & { listener: Listener }> {
+    const count = await db.build.count({
+        where: {
+            listener: {
+                project: {
+                    owner: {
+                        projects: {
+                            some: {
+                                id: listener.projectID
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
     const build = await db.build.create({
         data: {
+            count: count + 1,
             commit: info.commit,
             started: new Date(),
             listenerID: listener.id,
@@ -273,13 +290,17 @@ export async function run(request: Request, type: ListenerType, actions: Array<s
     if (actions.length > 0 && data.info.action && !actions.includes(data.info.action))
         return;
 
-    await flow(data, 'build', type);
+    try {
+        await flow(data, 'build', type);
 
-    if (data.listener.autodeploy) {
-        const result = await flow(data, 'deploy', type);
+        if (data.listener.autodeploy) {
+            const result = await flow(data, 'deploy', type);
 
-        if (data.listener.deployfe) {
-            await feflow(data.info, data.build, result);
+            if (data.listener.deployfe) {
+                await feflow(data.info, data.build, result);
+            }
         }
+    } finally {
+        builders.clean(data.build);
     }
 }

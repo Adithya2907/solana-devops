@@ -62,10 +62,11 @@ export async function build(owner: string, repo: string, commit: string, install
 
     outputStream.push("Finished download\n");
 
+    const base = path.join(PUBLIC_REPO_PATH, repoBuild.id.toString());
     const zipped = result?.data as ArrayBuffer;
-    const download = path.parse(path.join(PUBLIC_REPO_PATH, "download.zip"));
-    const name = path.join(PUBLIC_REPO_PATH, `${owner}-${repo}-${commit.substring(0, 7)}`);
-    const extracted = path.join(PUBLIC_REPO_PATH, 'repo');
+    const download = path.parse(path.join(base, "download.zip"));
+    const name = path.join(base, `${owner}-${repo}-${commit.substring(0, 7)}`);
+    const extracted = path.join(base, 'repo');
     const platform = path.resolve('src', 'lib', 'platform');
 
     fs.mkdirSync(download.dir, { recursive: true });
@@ -74,7 +75,7 @@ export async function build(owner: string, repo: string, commit: string, install
     outputStream.push("Downloaded file to " + path.format(download));
 
     await extract(path.format(download), {
-        dir: path.resolve(PUBLIC_REPO_PATH),
+        dir: path.resolve(base),
     });
 
     if (fs.existsSync(extracted))
@@ -83,9 +84,8 @@ export async function build(owner: string, repo: string, commit: string, install
 
     outputStream.push("\nExtracted repo to " + extracted);
 
-    process.env['_BUILD_REPO_PATH'] = path.resolve(PUBLIC_REPO_PATH);
+    process.env['_BUILD_REPO_PATH'] = path.resolve(base);
 
-    console.log(path.join(platform, 'version.sh'));
     const versions = childProcess.execSync(`. ${path.join(platform, "version.sh")}`).toString();
 
     outputStream.push("\n" + versions);
@@ -94,8 +94,6 @@ export async function build(owner: string, repo: string, commit: string, install
     process.env['_BUILD_ANCHOR_VERSION'] = versions.split('Found anchor version: ')[1].split('\n')[0].trim();
 
     outputStream.push(`found versions ${process.env['_BUILD_RUST_VERSION']} ${process.env['_BUILD_ANCHOR_VERSION']}`);
-
-    console.log("Building repo using ", path.join(platform, "build.sh"));
 
     const buildProcess = childProcess.execSync(`. ${path.join(platform, 'build.sh')}`).toString("utf-8");
     outputStream.push("\n" + buildProcess);
@@ -108,19 +106,17 @@ export async function build(owner: string, repo: string, commit: string, install
         region: 'ap-south-1'
     });
 
-    const idls = fs.readdirSync(path.join(PUBLIC_REPO_PATH, "repo", "target", "idl"));
+    const idls = fs.readdirSync(path.join(base, "repo", "target", "idl"));
     const idlkeys: Array<string> = [];
     idls
         .map(idl =>
-            path.join(PUBLIC_REPO_PATH, "repo", "target", "idl", idl))
+            path.join(base, "repo", "target", "idl", idl))
         .forEach(async (idl) => {
             try {
                 const key = Date.now() + "_" + path.basename(idl);
-                
-                console.log(key);
+
                 idlkeys.push(key);
-                console.log(idlkeys);
-                
+
                 await s3.putObject({
                     Bucket: 'idl-files',
                     Body: fs.createReadStream(idl),
@@ -128,13 +124,13 @@ export async function build(owner: string, repo: string, commit: string, install
                 });
             } catch (err) {
                 outputStream.push("ERROR: Could not upload IDL to S3");
-                outputStream.push("DESCRIPTION: " + err.message);
+                outputStream.push("DESCRIPTION: " + (err as Error).message);
 
                 buildResult.status = false;
             }
         });
 
-    let logupload: string;
+    let logupload = '';
 
     buildResult.log = readStream(outputStream);
 
@@ -150,24 +146,20 @@ export async function build(owner: string, repo: string, commit: string, install
         logupload = key;
     } catch (err) {
         outputStream.push("ERROR: Could not upload build logs to S3");
-        outputStream.push("DESCRIPTION: " + err.message);
+        outputStream.push("DESCRIPTION: " + (err as Error).message);
 
         buildResult.status = false;
     }
 
     buildResult.status = true;
 
-    console.log(idls, idlkeys);
-
-    const idlresult = await db.iDL.createMany({
+    await db.iDL.createMany({
         data: idlkeys.map((key, index) => ({
             program: idls[index].split('.')[0],
             key,
             buildId: repoBuild.id
         }))
     });
-
-    console.log(idlresult);
 
     await db.build.update({
         where: {

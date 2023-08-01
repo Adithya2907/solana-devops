@@ -103,12 +103,13 @@ export async function fe(owner: string, repository: string, commit: string, inst
         started_at: new Date().toISOString()
     });
 
-    const repo = path.join(PUBLIC_REPO_PATH, 'repo');
+    const base = path.join(PUBLIC_REPO_PATH, build.id.toString());
+    const repo = path.join(base, 'repo');
     const feapp = path.join(repo, plugin.dir);
     const feidl = path.join(repo, plugin.idl);
     const buildidl = path.join(repo, 'target', 'idl');
     const output = path.join(repo, plugin.output);
-    const upload = path.join(PUBLIC_REPO_PATH, 'upload.zip');
+    const upload = path.join(base, 'upload.zip');
 
     fs.cpSync(buildidl, feidl, { recursive: true });
 

@@ -49,8 +49,25 @@ export async function deploy(owner: string, repo: string, commit: string, instal
 
     const instance = await get(app).octokit?.getInstallationOctokit(installation);
 
+    const deploymentCount = await db.deploy.count({
+        where: {
+            listener: {
+                project: {
+                    owner: {
+                        projects: {
+                            some: {
+                                id: build.listener.projectID
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
     const deployment = await db.deploy.create({
         data: {
+            count: deploymentCount + 1,
             listenerID: build.listener.id,
             buildID: build.id,
             deployed: new Date()
@@ -72,8 +89,9 @@ export async function deploy(owner: string, repo: string, commit: string, instal
         started_at: new Date().toISOString()
     });
 
+    const base = path.join(PUBLIC_REPO_PATH, build.id.toString());
     const cluster = TargetMapping[build.listener.deploytarget];
-    const extracted = path.join(PUBLIC_REPO_PATH, 'repo');
+    const extracted = path.join(base, 'repo');
     const platform = path.resolve('src', 'lib', 'platform');
 
     process.env['_BUILD_CLUSTER'] = cluster;
@@ -103,7 +121,7 @@ export async function deploy(owner: string, repo: string, commit: string, instal
 
         outputStream.push(deployProcess);
 
-        const idlfiles = fs.readdirSync(path.join(PUBLIC_REPO_PATH, "repo", "target", "idl"));
+        const idlfiles = fs.readdirSync(path.join(base, "repo", "target", "idl"));
         const idlkeys: Record<string, string> = {};
 
         idlfiles.forEach(async idlfile => {
@@ -112,7 +130,7 @@ export async function deploy(owner: string, repo: string, commit: string, instal
 
             await s3.putObject({
                 Bucket: 'idl-files',
-                Body: fs.createReadStream(path.join(PUBLIC_REPO_PATH, "repo", "target", "idl", idlfile)),
+                Body: fs.createReadStream(path.join(base, "repo", "target", "idl", idlfile)),
                 Key: idlkey
             });
         });
@@ -136,7 +154,7 @@ export async function deploy(owner: string, repo: string, commit: string, instal
         result.status = true;
         result.log = readStream(outputStream);
     } catch (err) {
-        outputStream.push(err.message);
+        outputStream.push((err as Error).message);
     } finally {
         await instance?.rest.checks.update({
             owner,
